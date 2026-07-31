@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mednotes-postgres
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: mednotes
+      POSTGRES_PASSWORD: mednotes_dev
+      POSTGRES_DB: mednotes_dev
+    volumes:
+      - mednotes_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U mednotes -d mednotes_dev']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mednotes_pgdata:
