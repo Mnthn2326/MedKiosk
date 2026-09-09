@@ -42,7 +42,7 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
         setPatientId(data.id);
         setSearchStatus('found');
       }
-    } catch (_err) {
+    } catch {
       setSearchStatus('not_found');
     }
   };
@@ -81,7 +81,7 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
         const errData = await response.json().catch(() => ({}));
         setSubmitMessage({ type: 'error', text: errData.error || 'Failed to add event.' });
       }
-    } catch (_error) {
+    } catch {
       setSubmitMessage({ type: 'error', text: 'An unexpected error occurred.' });
     } finally {
       setIsSubmitting(false);
