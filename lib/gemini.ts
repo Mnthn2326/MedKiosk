@@ -97,3 +97,62 @@ ${context}`;
 
   return response.text ?? 'I was unable to process your request. Please try again.';
 }
+
+/**
+ * AI Scribe: Parses raw, unstructured doctor notes into structured medical data.
+ */
+export async function aiScribe(rawNotes: string): Promise<{
+  diagnosis: { title: string; icd_code: string; severity: string; clinical_impression: string };
+  symptoms: { chief_complaint: string; duration: string; details: string };
+  vitals: { bp: string; heart_rate: string; temperature: string; spo2: string; weight: string };
+  prescriptions: Array<{ medication: string; dosage: string; frequency: string; duration: string; instructions: string }>;
+}> {
+  const prompt = `You are a highly skilled AI medical scribe. Your task is to extract relevant clinical information from unstructured doctor's notes and structure it into a specific JSON format.
+
+If a specific piece of information is missing from the raw notes, leave the corresponding string field empty or return an empty array for prescriptions.
+
+RAW DOCTOR NOTES:
+${rawNotes}
+
+Return ONLY valid JSON matching this exact structure:
+{
+  "diagnosis": {
+    "title": "Main diagnosis",
+    "icd_code": "Best guess ICD-10 code, or empty",
+    "severity": "Severity of condition (e.g., Mild, Severe)",
+    "clinical_impression": "Summary of clinical impression"
+  },
+  "symptoms": {
+    "chief_complaint": "Primary complaint",
+    "duration": "Duration of symptoms",
+    "details": "Any extra details"
+  },
+  "vitals": {
+    "bp": "Blood pressure",
+    "heart_rate": "Heart rate",
+    "temperature": "Temperature",
+    "spo2": "SpO2 level",
+    "weight": "Weight"
+  },
+  "prescriptions": [
+    {
+      "medication": "Name of medication",
+      "dosage": "Dosage (e.g. 50mg)",
+      "frequency": "Frequency (e.g. TDS)",
+      "duration": "Duration (e.g. 3 days)",
+      "instructions": "Instructions (e.g. SOS)"
+    }
+  ]
+}`;
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-3.6-flash',
+    contents: prompt,
+    config: {
+      responseMimeType: 'application/json',
+    },
+  });
+
+  const text = response.text ?? '{}';
+  return JSON.parse(text);
+}

@@ -22,12 +22,35 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
   // Get patient info (deidentified only)
   const { data: patient } = await supabase
     .from('patients')
-    .select('id, deidentified_code')
+    .select('id, deidentified_code, gender, dob')
     .eq('id', patientId)
     .single();
 
   if (!patient) {
     redirect('/doctor/patients');
+  }
+
+  // Get the logged-in doctor's contributor record
+  const { data: profile } = await supabase
+    .from('users')
+    .select('id, name')
+    .eq('auth_id', user.id)
+    .single();
+
+  let contributorId = '';
+  let contributorDomain = '';
+
+  if (profile) {
+    const { data: contributor } = await supabase
+      .from('contributors')
+      .select('id, domain')
+      .eq('user_id', profile.id)
+      .single();
+
+    if (contributor) {
+      contributorId = contributor.id;
+      contributorDomain = contributor.domain || '';
+    }
   }
 
   // Fetch clinical events for this patient with contributor info
@@ -76,17 +99,50 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
     };
   }) as ClinicalEvent[];
 
+  // Compute patient age from DOB
+  let patientAge: string | null = null;
+  if (patient.dob) {
+    const dob = new Date(patient.dob);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    patientAge = `${age}y`;
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {/* Patient header with metadata */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-primary">Patient Timeline</h1>
-        <p className="text-text-muted mt-1">
-          Patient: <span className="font-mono font-semibold">{patient.deidentified_code}</span>
-        </p>
+        <div className="flex flex-wrap items-center gap-3 mt-2">
+          <span className="inline-flex items-center px-3 py-1 rounded-lg bg-primary/10 text-primary font-mono font-semibold text-sm">
+            {patient.deidentified_code}
+          </span>
+          {patient.gender && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-text-muted text-xs font-medium">
+              {patient.gender}
+            </span>
+          )}
+          {patientAge && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-text-muted text-xs font-medium">
+              Age: {patientAge}
+            </span>
+          )}
+          {contributorDomain && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-success/10 text-success text-xs font-medium capitalize">
+              {contributorDomain}
+            </span>
+          )}
+        </div>
       </div>
 
       <DoctorTimelineClient
         patientId={patientId}
+        patientCode={patient.deidentified_code}
+        contributorId={contributorId}
         initialEvents={transformedEvents}
       />
     </div>

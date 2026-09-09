@@ -43,12 +43,9 @@ export default function DoctorPatientsClient({
       ) : (
         <div className="space-y-3">
           {filtered.map((patient) => (
-            <Link
-              key={patient.id}
-              href={`/doctor/timeline/${patient.id}`}
-            >
-              <Card className="hover:shadow-md transition-shadow cursor-pointer mb-3">
-                <div className="flex items-center justify-between">
+            <Card key={patient.id} className="hover:shadow-md transition-shadow mb-3">
+              <div className="flex items-center justify-between">
+                <Link href={`/doctor/timeline/${patient.id}`} className="flex-1">
                   <div>
                     <p className="font-semibold text-primary">
                       {patient.deidentified_code}
@@ -59,10 +56,23 @@ export default function DoctorPatientsClient({
                       {patient.dob && `DOB: ${new Date(patient.dob).toLocaleDateString()}`}
                     </p>
                   </div>
-                  <span className="text-text-muted text-sm">View Timeline →</span>
+                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/doctor/timeline/${patient.id}?consult=true`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    🩺 Start Consultation
+                  </Link>
+                  <Link
+                    href={`/doctor/timeline/${patient.id}`}
+                    className="text-text-muted text-sm hover:text-primary transition-colors"
+                  >
+                    View Timeline →
+                  </Link>
                 </div>
-              </Card>
-            </Link>
+              </div>
+            </Card>
           ))}
         </div>
       )}
