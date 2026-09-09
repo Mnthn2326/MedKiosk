@@ -4,12 +4,15 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 /**
  * Generate a 768-dimensional embedding for text content.
- * Uses Gemini text-embedding-004 model.
+ * Uses Gemini gemini-embedding-001 model configured to 768 dimensions.
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
   const response = await ai.models.embedContent({
-    model: 'text-embedding-004',
+    model: 'gemini-embedding-001',
     contents: text,
+    config: {
+      outputDimensionality: 768,
+    },
   });
 
   return response.embeddings?.[0]?.values ?? [];
@@ -41,7 +44,7 @@ Be concise, factual, and only reference information present in the provided clin
 Respond ONLY with valid JSON, no markdown formatting.`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-3.6-flash',
     contents: prompt,
     config: {
       responseMimeType: 'application/json',
@@ -85,7 +88,7 @@ ${context}`;
   ];
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-3.6-flash',
     contents,
     config: {
       systemInstruction,
