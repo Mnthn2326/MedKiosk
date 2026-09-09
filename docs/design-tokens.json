@@ -1,0 +1,13 @@
+﻿{
+  "colors": {
+    "primary": "#0F4C5C", "primaryLight": "#E7EEF0", "accent": "#D85A30",
+    "success": "#1B8A5A", "warning": "#E0A106", "danger": "#C1121F",
+    "textPrimary": "#1B2B2E", "textMuted": "#64748B",
+    "border": "#E2E8F0", "background": "#FFFFFF"
+  },
+  "trustTierColors": {
+    "self_reported": "#94A3B8", "patient_uploaded": "#E0A106",
+    "institution_verified": "#0F4C5C", "doctor_confirmed": "#1B8A5A"
+  },
+  "font": "Inter", "radiusCard": "12px", "radiusButton": "8px"
+}

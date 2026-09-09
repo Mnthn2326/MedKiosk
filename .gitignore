@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 
+# Next.js
+.next/
+out/
+
 # Build output
 dist/
 build/
@@ -28,12 +32,9 @@ coverage/
 *.log
 npm-debug.log*
 
-# Docker PostgreSQL data
-pgdata/
-
-# Prisma
-backend/prisma/migrations/
-
 # Misc
 *.tsbuildinfo
 .eslintcache
+
+# Vercel
+.vercel
