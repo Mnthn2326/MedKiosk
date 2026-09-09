@@ -34,7 +34,7 @@ MediKiosk+ is a project built to showcase a full-stack health platform using a m
 1. **Clone the repository:**
    ```bash
    git clone <repository-url>
-   cd MedNotes
+   cd MedKiosk
    ```
 
 2. **Install dependencies:**
@@ -98,3 +98,9 @@ Clean, clinical, and calm design tailored for healthcare.
 - **Typography:** Inter
 - **Palette:** Trust-tier badge colors (Teal for verified, Green for confirmed, Amber for user-uploaded, Gray for self-reported).
 - **Components:** Restrained visual treatment for core clinical screens, with higher urgency colors (e.g., Red/Coral) reserved for emergency actions.
+
+## 🌐 Live Demo
+You can view and interact with the live deployment of MediKiosk+ here:
+**[View Live Demo](https://medkiosk.vercel.app)**
+
+*(Note: Since this is a test environment, payments use Razorpay Test Mode and no real money is processed.)*
