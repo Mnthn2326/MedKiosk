@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
+import { toast } from 'sonner';
+
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -18,17 +18,15 @@ export default function ResetPasswordPage() {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setMessage('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      toast.error('Password must be at least 6 characters');
       setLoading(false);
       return;
     }
@@ -38,10 +36,10 @@ export default function ResetPasswordPage() {
     });
 
     if (error) {
-      setError(error.message);
+      toast.error(error.message);
       setLoading(false);
     } else {
-      setMessage('Password updated successfully! Redirecting...');
+      toast.success('Password updated successfully! Redirecting...');
       // After updating password, they are securely logged in.
       // Redirect to homepage after a short delay
       setTimeout(() => {
@@ -55,18 +53,6 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md bg-white border border-border rounded-xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-primary text-center mb-6">MediKiosk+</h1>
         <h2 className="text-xl text-text-primary text-center mb-8">Set New Password</h2>
-        
-        {error && (
-          <div className="bg-danger/10 border border-danger text-danger px-4 py-3 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
-        )}
-
-        {message && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 text-sm">
-            {message}
-          </div>
-        )}
 
         <form onSubmit={handleUpdatePassword} className="space-y-4">
           <div>

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Icon } from '@/components/ui/Icon';
 import type { IconName } from '@/components/ui/Icon';
 import type { BadgeStatus, BadgeLabel } from '@/components/ui/Badge';
+import { toast } from 'sonner';
 
 interface EventCardProps {
   event: ClinicalEvent;
@@ -69,7 +70,18 @@ function DiagnosisContent({ content }: { content: Record<string, unknown> }) {
       {icd && (
         <div className="text-sm">
           <span className="font-semibold text-text-muted">ICD-10: </span>
-          <span className="text-text-primary tabular-nums">{icd}</span>
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              navigator.clipboard.writeText(icd);
+              toast.success("Copied code to clipboard");
+            }}
+            className="text-text-primary tabular-nums hover:text-primary transition-colors inline-flex items-center gap-1 cursor-pointer"
+            title="Copy ICD-10 Code"
+          >
+            {icd}
+            <Icon name="copy" size={12} className="text-text-muted opacity-50 hover:opacity-100" />
+          </button>
         </div>
       )}
       {notes && <p className="text-sm text-text-muted mt-2">{notes}</p>}

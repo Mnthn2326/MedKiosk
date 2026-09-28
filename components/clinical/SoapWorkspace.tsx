@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDraft } from '@/lib/useDraft';
 import { buildConsultationPayload, SoapState } from '@/lib/payloadBuilder';
 import { useDraftContext } from '@/components/ui/GuardedLink';
+import { toast } from 'sonner';
 
 interface SoapWorkspaceProps {
   patientId: string;
@@ -44,7 +45,6 @@ export default function SoapWorkspace({ patientId, userId, onSuccess }: SoapWork
 
   const { setIsDirty } = useDraftContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
   
   // Update GuardedLink context when draft dirtiness changes
   useEffect(() => {
@@ -135,13 +135,12 @@ export default function SoapWorkspace({ patientId, userId, onSuccess }: SoapWork
   const handleSubmit = async () => {
     if (submitGuard.current) return; // double-submit protection
     if (!draftState.assessment.diagnosisTitle.trim()) {
-      setError('Diagnosis Title is required');
+      toast.error('Diagnosis Title is required');
       return;
     }
 
     submitGuard.current = true;
     setIsSubmitting(true);
-    setError('');
 
     try {
       const payload = buildConsultationPayload(draftState, patientId);
@@ -160,12 +159,25 @@ export default function SoapWorkspace({ patientId, userId, onSuccess }: SoapWork
       onSuccess();
     } catch (err: unknown) {
       const e = err as { message?: string };
-      setError(e.message || 'Error submitting consultation');
+      toast.error(e.message || 'Error submitting consultation');
     } finally {
       setIsSubmitting(false);
       submitGuard.current = false;
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleSubmit();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [draftState, patientId]); // We need these dependencies because handleSubmit uses them
+
+
 
   return (
     <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-border p-4 overflow-y-auto">
@@ -173,12 +185,6 @@ export default function SoapWorkspace({ patientId, userId, onSuccess }: SoapWork
         <div className="mb-4 p-2 bg-amber-50 text-amber-800 text-sm rounded-md flex items-center gap-2 border border-amber-200">
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
           Unsaved draft restored.
-        </div>
-      )}
-      
-      {error && (
-        <div className="mb-4 p-3 bg-danger/10 text-danger text-sm rounded-lg border border-danger/20">
-          {error}
         </div>
       )}
 

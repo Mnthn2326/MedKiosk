@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { TrustTierBadge } from './TrustTierBadge';
+import { toast } from 'sonner';
 import type { EventType, TrustTier } from '@/types/database';
 
 interface ContributorFormProps {
@@ -20,7 +21,6 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
   const [content, setContent] = useState<Record<string, string>>({});
   
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const trustTier: TrustTier = contributorType === 'doctor' ? 'doctor_confirmed' : 'institution_verified';
 
@@ -28,7 +28,6 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
     if (!deidentifiedCode) return;
     setSearchStatus('searching');
     setPatientId(null);
-    setSubmitMessage(null);
     try {
       const { data, error } = await supabase
         .from('patients')
@@ -54,12 +53,11 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!patientId) {
-      setSubmitMessage({ type: 'error', text: 'Please search and verify a patient first.' });
+      toast.error('Please search and verify a patient first.');
       return;
     }
     
     setIsSubmitting(true);
-    setSubmitMessage(null);
     
     try {
       const response = await fetch('/api/clinical-events', {
@@ -75,18 +73,32 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
       });
       
       if (response.ok) {
-        setSubmitMessage({ type: 'success', text: 'Event added successfully.' });
+        toast.success('Event added successfully.');
         setContent({});
       } else {
         const errData = await response.json().catch(() => ({}));
-        setSubmitMessage({ type: 'error', text: errData.error || 'Failed to add event.' });
+        toast.error(errData.error || 'Failed to add event.');
       }
     } catch {
-      setSubmitMessage({ type: 'error', text: 'An unexpected error occurred.' });
+      toast.error('An unexpected error occurred.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        if (patientId && !isSubmitting) {
+          e.preventDefault();
+          // We must trigger the form submission with a mock event
+          handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [patientId, isSubmitting, deidentifiedCode, eventType, trustTier, content, contributorId]); // all dependencies of handleSubmit
 
   const renderContentFields = () => {
     switch (eventType) {
@@ -190,12 +202,6 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
             <h3 className="font-medium text-text-primary">Event Details</h3>
             {renderContentFields()}
           </div>
-
-          {submitMessage && (
-            <div className={`p-3 rounded-lg text-sm ${submitMessage.type === 'success' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
-              {submitMessage.text}
-            </div>
-          )}
 
           <div className="flex justify-end pt-4 border-t border-border/50">
             <button 

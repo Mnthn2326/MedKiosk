@@ -58,3 +58,18 @@ body {
   background: var(--color-background);
   font-family: var(--font-sans);
 }
+
+/* Sonner Toast Customizations */
+:root {
+  --normal-bg: var(--color-surface-card);
+  --normal-border: var(--color-border);
+  --normal-text: var(--color-text-primary);
+  --success-bg: var(--color-success);
+  --success-text: #FFFFFF;
+  --error-bg: var(--color-danger);
+  --error-text: #FFFFFF;
+  --warning-bg: var(--color-warning);
+  --warning-text: #FFFFFF;
+  --info-bg: var(--color-primary);
+  --info-text: #FFFFFF;
+}

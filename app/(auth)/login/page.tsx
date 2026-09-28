@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -17,7 +17,6 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -25,7 +24,7 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError(error.message);
+      toast.error(error.message || 'Authentication failed');
       setLoading(false);
     } else {
       router.push('/');
@@ -37,12 +36,6 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white border border-border rounded-xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-primary text-center mb-6">MediKiosk+</h1>
         <h2 className="text-xl text-text-primary text-center mb-8">Sign in to your account</h2>
-        
-        {error && (
-          <div className="bg-danger/10 border border-danger text-danger px-4 py-3 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>

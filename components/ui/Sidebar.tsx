@@ -67,6 +67,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
     localStorage.setItem('mednotes_sidebar_collapsed', String(val));
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.defaultPrevented) return;
+      if (e.key === 'Escape' && mobileOpen) {
+        e.preventDefault();
+        setMobileOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileOpen]);
+
   const handleSignOut = async () => {
     // Clear drafts on logout
     for (let i = localStorage.length - 1; i >= 0; i--) {
@@ -165,6 +177,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
               </GuardedLink>
             );
           })}
+          
+          {/* Global Search Trigger */}
+          <button
+            onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+            className={`flex items-center justify-between px-3 py-2.5 mt-2 rounded-lg transition-colors whitespace-nowrap overflow-hidden text-white/80 hover:bg-white/10 hover:text-white group`}
+            title={isCollapsed ? "Search" : undefined}
+          >
+            <div className="flex items-center gap-3">
+              <Icon name="ai" size={20} className="shrink-0 opacity-70 group-hover:opacity-100 transition-opacity" />
+              <span className={`transition-opacity duration-300 ${isCollapsed ? 'md:opacity-0 md:w-0' : 'opacity-100'}`}>
+                Search
+              </span>
+            </div>
+            {!isCollapsed && (
+              <kbd className="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-mono font-medium text-white/60 bg-white/10 rounded">
+                ⌘K
+              </kbd>
+            )}
+          </button>
         </div>
 
         <div className="p-4 border-t border-white/10 shrink-0">

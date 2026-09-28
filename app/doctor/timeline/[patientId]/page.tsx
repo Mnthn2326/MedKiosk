@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import DoctorTimelineClient from './DoctorTimelineClient';
 import type { ClinicalEvent } from '@/types/database';
+import { CopyableCode } from '@/components/ui/CopyableCode';
 
 interface PageProps {
   params: Promise<{ patientId: string }>;
@@ -119,9 +120,7 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
       <div className="mb-6 sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-border/50 pb-4 pt-2 -mx-2 px-2">
         <h1 className="text-2xl font-bold text-primary">Patient Timeline</h1>
         <div className="flex flex-wrap items-center gap-3 mt-2">
-          <span className="inline-flex items-center px-3 py-1 rounded-lg bg-primary/10 text-primary font-mono font-semibold text-sm">
-            {patient.deidentified_code}
-          </span>
+          <CopyableCode code={patient.deidentified_code} />
           {patient.gender && (
             <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-text-muted text-xs font-medium">
               {patient.gender}

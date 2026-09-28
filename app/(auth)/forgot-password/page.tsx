@@ -3,28 +3,25 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setMessage('');
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/api/auth/callback?next=/reset-password`,
     });
 
     if (error) {
-      setError(error.message);
+      toast.error(error.message);
     } else {
-      setMessage('Password reset instructions have been sent to your email.');
+      toast.success('Password reset instructions have been sent to your email.');
     }
     setLoading(false);
   };
@@ -34,18 +31,6 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md bg-white border border-border rounded-xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-primary text-center mb-6">MediKiosk+</h1>
         <h2 className="text-xl text-text-primary text-center mb-8">Reset Password</h2>
-        
-        {error && (
-          <div className="bg-danger/10 border border-danger text-danger px-4 py-3 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
-        )}
-
-        {message && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 text-sm">
-            {message}
-          </div>
-        )}
 
         <form onSubmit={handleReset} className="space-y-4">
           <div>

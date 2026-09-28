@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Timeline from '@/components/clinical/Timeline';
 import Button from '@/components/ui/Button';
 import { Icon } from "@/components/ui/Icon";
+import { toast } from 'sonner';
 
 import SoapWorkspace from '@/components/clinical/SoapWorkspace';
 import { createClient } from '@/lib/supabase/client';
@@ -26,12 +27,10 @@ export default function DoctorTimelineClient({
   const searchParams = useSearchParams();
   const [events, setEvents] = useState<ClinicalEvent[]>(initialEvents);
   const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState('');
   
   // Mobile Tab State
   const [activeTab, setActiveTab] = useState<'timeline' | 'consultation'>('timeline');
 
-  const [successMessage, setSuccessMessage] = useState('');
   const supabase = createClient();
 
   // Switch tab if query param demands
@@ -40,6 +39,19 @@ export default function DoctorTimelineClient({
       setActiveTab('consultation');
     }
   }, [searchParams]);
+
+  // Global Esc Handler for closing active consultation "modal"/pane on mobile
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.defaultPrevented) return;
+      if (e.key === 'Escape' && activeTab === 'consultation') {
+        e.preventDefault();
+        setActiveTab('timeline');
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab]);
 
   // Supabase Realtime subscription for live updates
   useEffect(() => {
@@ -83,18 +95,9 @@ export default function DoctorTimelineClient({
     };
   }, [patientId, supabase]);
 
-  // Clear success message after 4 seconds
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(''), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage]);
-
   // Generate RAG summary
   const handleGenerateSummary = async () => {
     setGenerating(true);
-    setError('');
 
     try {
       const res = await fetch('/api/rag/summary', {
@@ -113,8 +116,9 @@ export default function DoctorTimelineClient({
         if (prev.find((e) => e.id === event.id)) return prev;
         return [event, ...prev];
       });
+      toast.success('AI Scribe successfully parsed unstructured notes');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate summary');
+      toast.error(err instanceof Error ? err.message : 'Failed to generate summary');
     } finally {
       setGenerating(false);
     }
@@ -143,15 +147,16 @@ export default function DoctorTimelineClient({
         setEvents((prev) =>
           prev.map((e) => (e.id === updatedEvent.id ? { ...e, ...updatedEvent } : e)),
         );
+        toast.success(`Review ${action} applied`);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Review action failed');
+        toast.error(err instanceof Error ? err.message : 'Review action failed');
       }
     },
     [],
   );
 
   const handleConsultationSuccess = () => {
-    setSuccessMessage('Consultation recorded successfully!');
+    toast.success(`Clinical note recorded for ${patientCode}`);
     if (window.innerWidth < 768) {
       setActiveTab('timeline'); // Switch back to timeline on mobile
     }
@@ -175,21 +180,6 @@ export default function DoctorTimelineClient({
           Consultation Note
         </button>
       </div>
-
-      {successMessage && (
-        <div className="mb-4 px-4 py-3 mx-2 md:mx-0 rounded-xl bg-success/10 border border-success/20 text-success text-sm font-medium flex items-center gap-2">
-          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {successMessage}
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-4 px-4 py-3 mx-2 md:mx-0 bg-danger/10 text-danger rounded-lg border border-danger/20 text-sm">
-          {error}
-        </div>
-      )}
 
       <div className="flex flex-1 overflow-hidden h-full gap-4 relative">
         {/* Left Pane: Timeline (hidden on mobile if tab is consultation) */}

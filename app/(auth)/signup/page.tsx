@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -12,7 +13,6 @@ export default function SignupPage() {
   const [role, setRole] = useState('patient');
   const [domain, setDomain] = useState('');
   const [verifiedId, setVerifiedId] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -20,7 +20,6 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       // 1. Sign up with auth
@@ -70,7 +69,7 @@ export default function SignupPage() {
     } catch (err: unknown) {
       console.error('Signup error:', err);
       const errorObj = err as { message?: string };
-      setError(errorObj?.message || (typeof err === 'string' ? err : 'An error occurred during signup'));
+      toast.error(errorObj?.message || (typeof err === 'string' ? err : 'An error occurred during signup'));
       setLoading(false);
     }
   };
@@ -82,12 +81,6 @@ export default function SignupPage() {
       <div className="w-full max-w-md bg-white border border-border rounded-xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-primary text-center mb-6">MediKiosk+</h1>
         <h2 className="text-xl text-text-primary text-center mb-8">Create your account</h2>
-        
-        {error && (
-          <div className="bg-danger/10 border border-danger text-danger px-4 py-3 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSignup} className="space-y-4">
           <div>

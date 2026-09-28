@@ -8,7 +8,8 @@ import {
   Pill,
   AlertTriangle,
   MessageSquare,
-  FileText
+  FileText,
+  Copy
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -23,7 +24,8 @@ export type IconName =
   | 'prescription' 
   | 'alert' 
   | 'chat' 
-  | 'notes';
+  | 'notes'
+  | 'copy';
 
 const iconMap: Record<IconName, LucideIcon> = {
   diagnosis: Stethoscope,
@@ -37,6 +39,7 @@ const iconMap: Record<IconName, LucideIcon> = {
   alert: AlertTriangle,
   chat: MessageSquare,
   notes: FileText,
+  copy: Copy,
 };
 
 interface IconProps {
