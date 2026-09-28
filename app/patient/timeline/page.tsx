@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import PatientTimelineClient from './PatientTimelineClient';
@@ -28,7 +29,7 @@ export default async function PatientTimelinePage() {
   // Get patient record
   const { data: patient } = await supabase
     .from('patients')
-    .select('id, deidentified_code')
+    .select('id, deidentified_code, gender, dob')
     .eq('user_id', profile.id)
     .single();
 
@@ -82,22 +83,46 @@ export default async function PatientTimelinePage() {
     };
   }) as ClinicalEvent[];
 
+  // Compute patient age from DOB server-side (never pass DOB to client)
+  let patientAge: string | null = null;
+  if (patient.dob) {
+    const dob = new Date(patient.dob);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    patientAge = age > 89 ? '90+' : `${age} yrs`;
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-primary">My Health Timeline</h1>
-        <p className="text-text-muted mt-1">
-          Welcome, <span className="font-semibold">{profile.name}</span>
-        </p>
-        <p className="text-xs text-text-muted mt-1">
-          Your de-identified code: <span className="font-mono">{patient.deidentified_code}</span>
-        </p>
+      <div className="mb-6 sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-border/50 pb-4 pt-2 -mx-2 px-2">
+        <h1 className="text-2xl font-bold text-primary">{profile.name}</h1>
+        <div className="flex flex-wrap items-center gap-3 mt-2">
+          <span className="inline-flex items-center px-3 py-1 rounded-lg bg-primary/10 text-primary font-mono font-semibold text-sm">
+            Share Code: {patient.deidentified_code}
+          </span>
+          {patient.gender && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-text-muted text-xs font-medium">
+              {patient.gender}
+            </span>
+          )}
+          {patientAge && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-text-muted text-xs font-medium">
+              Age: {patientAge}
+            </span>
+          )}
+        </div>
       </div>
 
-      <PatientTimelineClient
-        patientId={patient.id}
-        initialEvents={transformedEvents}
-      />
+      <Suspense fallback={<div className="p-4 text-center text-text-muted animate-pulse">Loading timeline...</div>}>
+        <PatientTimelineClient
+          patientId={patient.id}
+          initialEvents={transformedEvents}
+        />
+      </Suspense>
     </div>
   );
 }

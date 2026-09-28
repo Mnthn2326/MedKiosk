@@ -4,18 +4,37 @@ import { generateEmbedding } from '@/lib/gemini';
 
 export async function POST(request: NextRequest) {
   try {
+    // We are using the user-scoped client here, which respects RLS.
+    // However, the check against patient access is also done manually for clarity.
     const supabase = await createClient();
 
     // Verify authentication
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Get the user's role and profile
+    const { data: profile } = await supabase
+      .from('users')
+      .select('id, role')
+      .eq('auth_id', user.id)
+      .single();
+
+    if (!profile) {
+      return NextResponse.json({ error: 'User profile not found' }, { status: 403 });
+    }
+
+    if (!['doctor', 'lab', 'diagnostic_center'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Role not authorized to insert events' }, { status: 403 });
+    }
+
     const body = await request.json();
-    const { deidentified_code, patient_id: req_patient_id, event_type, trust_tier, content, contributor_id, events } = body;
+    // We completely ignore body.contributor_id for security
+    const { deidentified_code, patient_id: req_patient_id, event_type, trust_tier, content, events } = body;
 
     let final_patient_id = req_patient_id;
 
@@ -26,59 +45,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!final_patient_id && deidentified_code) {
-      // Look up patient by deidentified_code
-      const { data: patient, error: patientError } = await supabase
-        .from('patients')
-        .select('id')
-        .eq('deidentified_code', deidentified_code)
-        .single();
-
-      if (patientError || !patient) {
-        return NextResponse.json(
-          { error: 'Patient not found with this de-identified code' },
-          { status: 404 },
-        );
-      }
-      final_patient_id = patient.id;
+    // Lookup patient (verifies existence and access)
+    let patientQuery = supabase.from('patients').select('id');
+    if (final_patient_id) {
+      patientQuery = patientQuery.eq('id', final_patient_id);
+    } else {
+      patientQuery = patientQuery.eq('deidentified_code', deidentified_code);
     }
 
-    // Auto-resolve contributor
-    let final_contributor_id = contributor_id;
+    const { data: patient, error: patientError } = await patientQuery.single();
+
+    if (patientError || !patient) {
+      return NextResponse.json(
+        { error: 'Patient not found or access denied' },
+        { status: 404 },
+      );
+    }
+    
+    final_patient_id = patient.id;
+
+    // Securely derive contributor_id from session
+    let final_contributor_id: string | null = null;
     let contributorType: string | null = null;
 
-    if (final_contributor_id === undefined) {
-      // Look up authenticated user's contributor record
-      const { data: profile } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
+    const { data: contributor } = await supabase
+      .from('contributors')
+      .select('id, type')
+      .eq('user_id', profile.id)
+      .single();
       
-      if (profile) {
-        const { data: contributor } = await supabase
-          .from('contributors')
-          .select('id, type')
-          .eq('user_id', profile.id)
-          .single();
-        if (contributor) {
-          final_contributor_id = contributor.id;
-          contributorType = contributor.type;
-        } else {
-          final_contributor_id = null;
-        }
-      } else {
-        final_contributor_id = null;
-      }
-    } else if (final_contributor_id) {
-      const { data: contributor } = await supabase
-        .from('contributors')
-        .select('type')
-        .eq('id', final_contributor_id)
-        .single();
-      if (contributor) {
-        contributorType = contributor.type;
-      }
+    if (contributor) {
+      final_contributor_id = contributor.id;
+      contributorType = contributor.type;
     }
 
     // Helper to resolve trust_tier
@@ -129,7 +127,7 @@ export async function POST(request: NextRequest) {
       // Insert clinical event
       const insertData: Record<string, unknown> = {
         patient_id: final_patient_id,
-        contributor_id: final_contributor_id || null,
+        contributor_id: final_contributor_id, // Safely derived from session
         event_type: ev.event_type,
         trust_tier: current_trust_tier,
         content: ev.content,

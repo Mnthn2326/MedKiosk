@@ -19,6 +19,32 @@
   --color-tier-institution-verified: #0F4C5C;
   --color-tier-doctor-confirmed: #1B8A5A;
 
+  /* Semantic Status Colors */
+  --color-status-confirmed-bg: #D1FAE5;
+  --color-status-confirmed-text: #064E3B;
+  --color-status-confirmed-dot: #1B8A5A;
+
+  --color-status-pending-bg: #E7EEF0;
+  --color-status-pending-text: #0F4C5C;
+  --color-status-pending-dot: #64748B;
+
+  --color-status-abnormal-bg: #FEF3C7;
+  --color-status-abnormal-text: #78350F;
+  --color-status-abnormal-dot: #E0A106;
+
+  --color-status-critical-bg: #FEE2E2;
+  --color-status-critical-text: #7F1D1D;
+  --color-status-critical-dot: #C1121F;
+  
+  /* Neutral scale */
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-800: #1E293B;
+  
+  /* Surface & Depth */
+  --color-surface-card: #FFFFFF;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+
   /* Radii */
   --radius-card: 12px;
   --radius-button: 8px;

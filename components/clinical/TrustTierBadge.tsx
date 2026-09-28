@@ -1,44 +1,36 @@
 import React from 'react';
 import type { TrustTier } from '@/types/database';
+import { Badge } from '@/components/ui/Badge';
+import type { BadgeStatus, BadgeLabel } from '@/components/ui/Badge';
 
 interface TrustTierBadgeProps {
   tier: TrustTier;
 }
 
-const tierConfig: Record<TrustTier, { label: string; bg: string; textClass: string }> = {
+// Map database trust tiers to our semantic Badge statuses and labels
+const TIER_MAP: Record<TrustTier, { status: BadgeStatus; label: BadgeLabel }> = {
   self_reported: {
+    status: 'pending',
     label: 'Self Reported',
-    bg: '#94A3B8',
-    textClass: 'text-gray-900',
   },
   patient_uploaded: {
+    status: 'abnormal',
     label: 'Patient Uploaded',
-    bg: '#E0A106',
-    textClass: 'text-gray-900',
   },
   institution_verified: {
+    status: 'pending', // Teal / Primary
     label: 'Institution Verified',
-    bg: '#0F4C5C',
-    textClass: 'text-white',
   },
   doctor_confirmed: {
+    status: 'confirmed',
     label: 'Doctor Confirmed',
-    bg: '#1B8A5A',
-    textClass: 'text-white',
   },
 };
 
 export function TrustTierBadge({ tier }: TrustTierBadgeProps) {
-  const config = tierConfig[tier] || tierConfig.self_reported;
+  const config = TIER_MAP[tier] || TIER_MAP.self_reported;
   
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.textClass}`}
-      style={{ backgroundColor: config.bg }}
-    >
-      {config.label}
-    </span>
-  );
+  return <Badge status={config.status} label={config.label} />;
 }
 
 export default TrustTierBadge;

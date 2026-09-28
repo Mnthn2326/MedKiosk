@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Card from '@/components/ui/Card';
+import { Icon } from '@/components/ui/Icon';
 
 interface PatientListItem {
   id: string;
@@ -62,7 +63,7 @@ export default function DoctorPatientsClient({
                     href={`/doctor/timeline/${patient.id}?consult=true`}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors"
                   >
-                    🩺 Start Consultation
+                    <Icon name="diagnosis" size={14} className="text-white" /> Start Consultation
                   </Link>
                   <Link
                     href={`/doctor/timeline/${patient.id}`}

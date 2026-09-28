@@ -1,0 +1,65 @@
+{
+  "inputs": {
+    "diagnosisTitle": "Hypertension",
+    "icdCode": "I10",
+    "severity": "Moderate",
+    "status": "Active",
+    "chiefComplaint": "Headaches and dizziness",
+    "clinicalObservation": "Elevated BP reading",
+    "medications": [
+      {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "frequency": "daily",
+        "duration": "30 days",
+        "instructions": "Take in morning"
+      }
+    ],
+    "bloodPressure": "140/90",
+    "heartRate": "88",
+    "temperature": "98.6",
+    "spo2": "98",
+    "weight": "85"
+  },
+  "expectedPayload": {
+    "patient_id": "p-123",
+    "events": [
+      {
+        "event_type": "diagnosis",
+        "content": {
+          "title": "Hypertension",
+          "icd_code": "I10",
+          "severity": "Moderate",
+          "status": "Active",
+          "chief_complaint": "Headaches and dizziness",
+          "clinical_observation": "Elevated BP reading"
+        }
+      },
+      {
+        "event_type": "prescription",
+        "content": {
+          "medications": [
+            {
+              "name": "Lisinopril",
+              "dosage": "10mg",
+              "frequency": "daily",
+              "duration": "30 days",
+              "instructions": "Take in morning"
+            }
+          ]
+        }
+      },
+      {
+        "event_type": "note",
+        "content": {
+          "title": "Vitals",
+          "bp": "140/90",
+          "heart_rate": "88",
+          "temperature": "98.6",
+          "spo2": "98",
+          "weight": "85"
+        }
+      }
+    ]
+  }
+}

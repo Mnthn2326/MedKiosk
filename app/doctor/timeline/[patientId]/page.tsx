@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import DoctorTimelineClient from './DoctorTimelineClient';
@@ -99,7 +100,7 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
     };
   }) as ClinicalEvent[];
 
-  // Compute patient age from DOB
+  // Compute patient age from DOB server-side (never pass DOB to client)
   let patientAge: string | null = null;
   if (patient.dob) {
     const dob = new Date(patient.dob);
@@ -109,13 +110,13 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
       age--;
     }
-    patientAge = `${age}y`;
+    patientAge = age > 89 ? '90+' : `${age} yrs`;
   }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      {/* Patient header with metadata */}
-      <div className="mb-6">
+      {/* Sticky Patient header with metadata */}
+      <div className="mb-6 sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-border/50 pb-4 pt-2 -mx-2 px-2">
         <h1 className="text-2xl font-bold text-primary">Patient Timeline</h1>
         <div className="flex flex-wrap items-center gap-3 mt-2">
           <span className="inline-flex items-center px-3 py-1 rounded-lg bg-primary/10 text-primary font-mono font-semibold text-sm">
@@ -139,12 +140,14 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
         </div>
       </div>
 
-      <DoctorTimelineClient
-        patientId={patientId}
-        patientCode={patient.deidentified_code}
-        contributorId={contributorId}
-        initialEvents={transformedEvents}
-      />
+      <Suspense fallback={<div className="p-4 text-center text-text-muted animate-pulse">Loading timeline...</div>}>
+        <DoctorTimelineClient
+          patientId={patientId}
+          patientCode={patient.deidentified_code}
+          contributorId={contributorId}
+          initialEvents={transformedEvents}
+        />
+      </Suspense>
     </div>
   );
 }

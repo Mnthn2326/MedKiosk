@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import Navbar from '@/components/ui/Navbar';
+import Sidebar from '@/components/ui/Sidebar';
 
 export default async function PatientLayout({
   children,
@@ -26,9 +26,9 @@ export default async function PatientLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="patient" userName={userData.name} />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+      <Sidebar role="patient" userName={userData.name} />
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
     </div>

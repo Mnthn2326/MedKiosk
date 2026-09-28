@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import { Icon } from '@/components/ui/Icon';
 
 interface ChatMessage {
   role: 'user' | 'model';
@@ -77,7 +78,9 @@ export default function PatientChat() {
       <div className="flex-1 overflow-y-auto space-y-4 pb-4">
         {messages.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-4xl mb-4">💬</div>
+            <div className="text-4xl mb-4 text-primary flex justify-center">
+              <Icon name="chat" size={48} />
+            </div>
             <h3 className="text-lg font-semibold text-primary mb-2">
               Ask about your health records
             </h3>
@@ -168,8 +171,9 @@ export default function PatientChat() {
             Send
           </Button>
         </div>
-        <p className="text-xs text-text-muted mt-2">
-          ⚠️ This assistant only answers from your medical records and does not provide medical advice.
+        <p className="text-xs text-text-muted mt-2 flex items-center gap-1">
+          <Icon name="alert" size={12} className="text-status-abnormal-dot" />
+          This assistant only answers from your medical records and does not provide medical advice.
         </p>
       </div>
     </div>

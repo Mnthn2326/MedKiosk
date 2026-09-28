@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import Navbar from '@/components/ui/Navbar';
+import Sidebar from '@/components/ui/Sidebar';
+import { DraftProvider } from '@/components/ui/GuardedLink';
 
 export default async function DoctorLayout({
   children,
@@ -26,11 +27,13 @@ export default async function DoctorLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="doctor" userName={userData.name} />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
-      </main>
-    </div>
+    <DraftProvider>
+      <div className="min-h-screen bg-background flex flex-col md:flex-row">
+        <Sidebar role="doctor" userName={userData.name} />
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {children}
+        </main>
+      </div>
+    </DraftProvider>
   );
 }
