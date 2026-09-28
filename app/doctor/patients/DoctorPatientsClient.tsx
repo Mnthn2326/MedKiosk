@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Card from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { toast } from 'sonner';
 
 interface PatientListItem {
@@ -44,9 +45,14 @@ export default function DoctorPatientsClient({
 
       {/* Patient list */}
       {filtered.length === 0 ? (
-        <p className="text-text-muted text-center py-8">
-          {search ? 'No patients match your search.' : 'No patients found.'}
-        </p>
+        <EmptyState
+          icon="diagnosis"
+          title="No Patients Found"
+          description={search ? `No patient matching '${search}' was found. Check the de-identified code or clear filters.` : "No patients found in your records."}
+          actionLabel={search ? "Clear Search" : undefined}
+          onAction={search ? () => setSearch('') : undefined}
+          variant="subtle"
+        />
       ) : (
         <div className="space-y-3">
           {filtered.map((patient) => (

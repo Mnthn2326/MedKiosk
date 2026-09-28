@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateEmbedding, chatWithContext } from '@/lib/gemini';
 import { retrieveRelevantEvents, formatEventsAsContext } from '@/lib/rag';
+import { ragChatSchema, createValidationError } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,13 +42,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Patient record not found' }, { status: 404 });
     }
 
-    const body = await request.json();
-    const { message, history = [] } = body;
-
-    if (!message || typeof message !== 'string') {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    let rawBody;
+    try {
+      rawBody = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
     }
 
+    const validationResult = ragChatSchema.safeParse(rawBody);
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationError(validationResult.error), { status: 400 });
+    }
+
+    const { message, history } = validationResult.data;
     // Generate embedding for the question for similarity search
     let queryEmbedding: number[] = [];
     try {

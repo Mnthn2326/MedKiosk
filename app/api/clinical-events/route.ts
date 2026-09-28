@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateEmbedding } from '@/lib/gemini';
+import { clinicalEventSchema, createValidationError } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
-    // We are using the user-scoped client here, which respects RLS.
-    // However, the check against patient access is also done manually for clarity.
     const supabase = await createClient();
 
     // Verify authentication
@@ -32,18 +31,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Role not authorized to insert events' }, { status: 403 });
     }
 
-    const body = await request.json();
-    // We completely ignore body.contributor_id for security
-    const { deidentified_code, patient_id: req_patient_id, event_type, trust_tier, content, events } = body;
+    let rawBody;
+    try {
+      rawBody = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    }
+
+    const validationResult = clinicalEventSchema.safeParse(rawBody);
+    
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationError(validationResult.error), { status: 400 });
+    }
+
+    const { deidentified_code, patient_id: req_patient_id, event_type, trust_tier, content, events } = validationResult.data;
 
     let final_patient_id = req_patient_id;
-
-    if (!final_patient_id && !deidentified_code) {
-      return NextResponse.json(
-        { error: 'Missing patient identifier: must provide either patient_id or deidentified_code' },
-        { status: 400 },
-      );
-    }
 
     // Lookup patient (verifies existence and access)
     let patientQuery = supabase.from('patients').select('id');
@@ -87,26 +90,11 @@ export async function POST(request: NextRequest) {
       return null;
     };
 
-    const validEventTypes = ['diagnosis', 'prescription', 'lab_report', 'note'];
-    const eventsToProcess = events && Array.isArray(events) ? events : [{ event_type, content, trust_tier }];
-
-    if (eventsToProcess.length === 0) {
-      return NextResponse.json({ error: 'No events provided' }, { status: 400 });
-    }
+    const eventsToProcess = events && events.length > 0 ? events : [{ event_type, content, trust_tier }];
 
     const insertedEvents = [];
 
     for (const ev of eventsToProcess) {
-      if (!ev.event_type || !ev.content) {
-        return NextResponse.json(
-          { error: 'Missing required fields in event: event_type, content' },
-          { status: 400 }
-        );
-      }
-      if (!validEventTypes.includes(ev.event_type)) {
-        return NextResponse.json({ error: 'Invalid event_type' }, { status: 400 });
-      }
-
       const current_trust_tier = resolveTrustTier(ev.trust_tier || trust_tier);
       if (!current_trust_tier) {
         return NextResponse.json(

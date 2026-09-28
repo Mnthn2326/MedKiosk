@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { aiScribe } from '@/lib/gemini';
+import { aiScribeSchema, createValidationError } from '@/lib/validations';
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,12 +26,19 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Extract raw_notes from the request body
-    const body = await req.json();
-    const { raw_notes } = body;
-
-    if (!raw_notes || typeof raw_notes !== 'string') {
-      return NextResponse.json({ error: 'Invalid request: raw_notes must be a non-empty string' }, { status: 400 });
+    let rawBody;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
     }
+
+    const validationResult = aiScribeSchema.safeParse(rawBody);
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationError(validationResult.error), { status: 400 });
+    }
+
+    const { raw_notes } = validationResult.data;
 
     // 4. Call the aiScribe function
     const structuredResult = await aiScribe(raw_notes);

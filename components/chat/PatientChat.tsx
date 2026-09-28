@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface ChatMessage {
   role: 'user' | 'model';
@@ -77,17 +78,12 @@ export default function PatientChat() {
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto space-y-4 pb-4">
         {messages.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4 text-primary flex justify-center">
-              <Icon name="chat" size={48} />
-            </div>
-            <h3 className="text-lg font-semibold text-primary mb-2">
-              Ask about your health records
-            </h3>
-            <p className="text-text-muted text-sm max-w-md mx-auto">
-              I can help you understand your clinical records. I only answer based on your
-              own medical records and cannot provide medical advice.
-            </p>
+          <EmptyState
+            icon="chat"
+            title="Ask about your health records"
+            description="I can help you understand your clinical records. I only answer based on your own medical records and cannot provide medical advice."
+            variant="subtle"
+          >
             <div className="mt-6 space-y-2">
               <p className="text-xs text-text-muted">Try asking:</p>
               <div className="flex flex-wrap gap-2 justify-center">
@@ -101,14 +97,14 @@ export default function PatientChat() {
                     onClick={() => {
                       setInput(suggestion);
                     }}
-                    className="px-3 py-1.5 text-xs border border-border rounded-lg hover:bg-primary-light transition-colors text-text-muted"
+                    className="px-3 py-1.5 text-xs border border-border rounded-lg hover:bg-primary/10 transition-colors text-text-muted"
                   >
                     {suggestion}
                   </button>
                 ))}
               </div>
             </div>
-          </div>
+          </EmptyState>
         )}
 
         {messages.map((msg, i) => (

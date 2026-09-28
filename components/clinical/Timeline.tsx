@@ -4,6 +4,7 @@ import React from 'react';
 import type { ClinicalEvent, TrustTier, AiSummaryContent } from '@/types/database';
 import { EventCard } from './EventCard';
 import { SummaryCard } from './SummaryCard';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface TimelineProps {
   events: ClinicalEvent[];
@@ -28,9 +29,12 @@ const TIER_LABELS: Record<TrustTier, string> = {
 export function Timeline({ events, onReview, readOnly = false }: TimelineProps) {
   if (!events || events.length === 0) {
     return (
-      <div className="text-center py-10 text-text-muted">
-        No clinical events found for this patient.
-      </div>
+      <EmptyState
+        icon="notes"
+        title="No Clinical History Recorded Yet"
+        description="Clinical events and diagnostic reports will automatically appear here as authorized doctors and laboratories contribute to this record."
+        variant="subtle"
+      />
     );
   }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { AiSummaryContent } from '@/types/database';
+import { reviewSchema, createValidationError } from '@/lib/validations';
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -24,23 +24,19 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Only doctors can review summaries' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { event_id, action, edited_content } = body as {
-      event_id: string;
-      action: 'accept' | 'edit' | 'reject';
-      edited_content?: AiSummaryContent;
-    };
-
-    if (!event_id || !action) {
-      return NextResponse.json({ error: 'event_id and action are required' }, { status: 400 });
+    let rawBody;
+    try {
+      rawBody = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
     }
 
-    if (!['accept', 'edit', 'reject'].includes(action)) {
-      return NextResponse.json(
-        { error: 'Invalid action. Must be accept, edit, or reject' },
-        { status: 400 },
-      );
+    const validationResult = reviewSchema.safeParse(rawBody);
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationError(validationResult.error), { status: 400 });
     }
+
+    const { event_id, action, edited_content } = validationResult.data;
 
     // Verify the event exists and is an ai_summary
     const { data: existingEvent, error: fetchError } = await supabase
@@ -72,12 +68,6 @@ export async function PATCH(request: NextRequest) {
 
       case 'edit':
         // Edit: overwrite content with edited version, promote trust tier
-        if (!edited_content) {
-          return NextResponse.json(
-            { error: 'edited_content is required for edit action' },
-            { status: 400 },
-          );
-        }
         updateData = {
           content: edited_content,
           trust_tier: 'doctor_confirmed',
