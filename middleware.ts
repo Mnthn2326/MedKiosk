@@ -1,14 +1,8 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { publicRoutes, roleRouteMap, isPublicRoute } from '@/lib/authRoutes';
 
-const publicRoutes = ['/login', '/signup', '/api/auth/callback'];
-
-const roleRouteMap: Record<string, string> = {
-  patient: '/patient',
-  doctor: '/doctor',
-  lab: '/contributor',
-  diagnostic_center: '/contributor',
-};
+export { publicRoutes, roleRouteMap };
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -34,8 +28,8 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Allow public routes
-  if (publicRoutes.some((route) => pathname.startsWith(route))) {
+  // Allow public routes (e.g. /login, /signup, /forgot-password, /reset-password, /api/auth/callback)
+  if (isPublicRoute(pathname)) {
     return supabaseResponse;
   }
 

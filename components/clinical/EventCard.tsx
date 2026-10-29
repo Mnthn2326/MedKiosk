@@ -6,6 +6,9 @@ import { Icon } from '@/components/ui/Icon';
 import type { IconName } from '@/components/ui/Icon';
 import type { BadgeStatus, BadgeLabel } from '@/components/ui/Badge';
 import { toast } from 'sonner';
+import { getDiagnosisTitle } from '@/lib/diagnosis';
+import { getMedicationName } from '@/lib/prescription';
+export { getDiagnosisTitle, getMedicationName };
 
 interface EventCardProps {
   event: ClinicalEvent;
@@ -39,19 +42,23 @@ function getStatusStatus(status: string | undefined): BadgeStatus {
 }
 
 /* Diagnosis renderer */
-function DiagnosisContent({ content }: { content: Record<string, unknown> }) {
-  const diagnosis = content.diagnosis as string | undefined;
-  const icd = content.icd_code as string | undefined;
-  const severity = (content.severity as string | undefined)?.toLowerCase();
-  const status = (content.status as string | undefined)?.toLowerCase();
-  const notes = content.notes as string | undefined;
+function DiagnosisContent({ content }: { content?: Record<string, unknown> | null }) {
+  const safeContent = content && typeof content === 'object' ? content : {};
+  const diagnosis = getDiagnosisTitle(safeContent);
+  const icd = typeof safeContent.icd_code === 'string' ? safeContent.icd_code : undefined;
+  const severity = (safeContent.severity as string | undefined)?.toLowerCase();
+  const status = (safeContent.status as string | undefined)?.toLowerCase();
+  const notes =
+    (typeof safeContent.notes === 'string' && safeContent.notes) ||
+    (typeof safeContent.description === 'string' && safeContent.description) ||
+    undefined;
 
   return (
     <div className="space-y-3">
       {/* Title + badges row */}
       <div className="flex flex-wrap items-center gap-2">
         <h4 className="text-lg font-bold text-text-primary">
-          {diagnosis || 'Unknown Diagnosis'}
+          {diagnosis}
         </h4>
         {severity && (
           <Badge 
@@ -90,16 +97,24 @@ function DiagnosisContent({ content }: { content: Record<string, unknown> }) {
 }
 
 /* Prescription renderer */
-function PrescriptionContent({ content }: { content: Record<string, unknown> }) {
+function PrescriptionContent({ content }: { content?: Record<string, unknown> | null }) {
+  if (!content || typeof content !== 'object') {
+    return null;
+  }
+
   const isMulti = Array.isArray(content.medications);
   if (isMulti) {
-    const medications = content.medications as Array<{
-      medication: string;
-      dosage?: string;
-      frequency?: string;
-      duration?: string;
-      instructions?: string;
-    }>;
+    const rawMedications = content.medications as unknown[];
+    const medications = rawMedications.filter(
+      (m): m is Record<string, unknown> => m !== null && typeof m === 'object'
+    );
+
+    if (medications.length === 0) {
+      return (
+        <div className="text-sm text-text-muted italic">No medications recorded.</div>
+      );
+    }
+
     return (
       <div className="space-y-2">
         <span className="text-xs font-semibold uppercase tracking-wide text-text-muted">
@@ -118,20 +133,35 @@ function PrescriptionContent({ content }: { content: Record<string, unknown> }) 
               </tr>
             </thead>
             <tbody>
-              {medications.map((med, idx) => (
-                <tr key={idx} className="border-b border-border/30 last:border-0">
-                  <td className="px-3 py-2 text-text-muted tabular-nums">{idx + 1}</td>
-                  <td className="px-3 py-2 font-medium text-text-primary">{med.medication}</td>
-                  <td className="px-3 py-2">
-                    <span className="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-semibold tabular-nums">
-                      {med.dosage}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2 text-text-primary">{med.frequency}</td>
-                  <td className="px-3 py-2 text-text-primary">{med.duration}</td>
-                  <td className="px-3 py-2 text-text-muted italic">{med.instructions || '—'}</td>
-                </tr>
-              ))}
+              {medications.map((med, idx) => {
+                const medName = getMedicationName(med);
+                const dosage = med.dosage ? String(med.dosage) : '';
+                const frequency = med.frequency ? String(med.frequency) : '';
+                const duration = med.duration ? String(med.duration) : '';
+                const instructions =
+                  (med.instructions ? String(med.instructions) : '') ||
+                  (med.notes ? String(med.notes) : '') ||
+                  '—';
+
+                return (
+                  <tr key={idx} className="border-b border-border/30 last:border-0">
+                    <td className="px-3 py-2 text-text-muted tabular-nums">{idx + 1}</td>
+                    <td className="px-3 py-2 font-medium text-text-primary">{medName}</td>
+                    <td className="px-3 py-2">
+                      {dosage ? (
+                        <span className="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-semibold tabular-nums">
+                          {dosage}
+                        </span>
+                      ) : (
+                        <span className="text-text-muted text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-text-primary">{frequency || '—'}</td>
+                    <td className="px-3 py-2 text-text-primary">{duration || '—'}</td>
+                    <td className="px-3 py-2 text-text-muted italic">{instructions}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -140,16 +170,20 @@ function PrescriptionContent({ content }: { content: Record<string, unknown> }) 
   }
 
   // Fallback: single-drug legacy format
-  if (content.medication) {
+  const singleName = getMedicationName(content);
+  if (singleName !== 'Unnamed Medication' || content.dosage) {
     const dosage = content.dosage ? String(content.dosage) : '';
     const frequency = content.frequency ? String(content.frequency) : '';
     const duration = content.duration ? String(content.duration) : '';
-    const notes = content.notes ? String(content.notes) : '';
+    const notes =
+      (content.notes ? String(content.notes) : '') ||
+      (content.instructions ? String(content.instructions) : '');
+
     return (
       <div className="space-y-2">
         <span className="text-xs font-semibold uppercase tracking-wide text-text-muted">Rx</span>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium text-text-primary">{String(content.medication)}</span>
+          <span className="font-medium text-text-primary">{singleName}</span>
           {dosage && (
             <span className="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-semibold tabular-nums">
               {dosage}
@@ -212,7 +246,7 @@ export function EventCard({ event, readOnly: _readOnly = false }: EventCardProps
   const isPrescription = event.event_type === 'prescription';
   const isVitalsNote =
     event.event_type === 'note' &&
-    (event.content.title as string)?.toLowerCase() === 'vitals';
+    ((event.content as Record<string, unknown> | undefined)?.title as string)?.toLowerCase() === 'vitals';
 
   const borderClass = isAiSummary
     ? 'border-l-4 border-accent'
@@ -267,7 +301,7 @@ export function EventCard({ event, readOnly: _readOnly = false }: EventCardProps
         ) : (
           /* Default: generic key-value rendering */
           <div className="space-y-2 text-sm">
-            {Object.entries(event.content).map(([key, value]) => {
+            {Object.entries(event.content || {}).map(([key, value]) => {
               if (key === 'rejected') return null;
               // If the value is an array or object, JSON-stringify it
               const display =

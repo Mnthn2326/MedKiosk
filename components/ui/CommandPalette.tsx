@@ -73,7 +73,9 @@ export function CommandPalette() {
         defaultLinks.push({ id: 'link-1', type: 'link', label: 'My Patients', href: '/doctor/patients' });
       } else if (role === 'patient') {
         defaultLinks.push({ id: 'link-1', type: 'link', label: 'My Timeline', href: '/patient/timeline' });
-        defaultLinks.push({ id: 'link-2', type: 'link', label: 'Chat', href: '/patient/chat' });
+        defaultLinks.push({ id: 'link-2', type: 'link', label: 'AI Chat', href: '/patient/chat' });
+        defaultLinks.push({ id: 'link-3', type: 'link', label: 'FinHealth & Claims', href: '/patient/finhealth' });
+        defaultLinks.push({ id: 'link-4', type: 'link', label: 'Emergency SOS & Dispatch', href: '/patient/emergency' });
       } else if (role && ['lab', 'diagnostic_center'].includes(role)) {
         defaultLinks.push({ id: 'link-1', type: 'link', label: 'Add Event', href: '/contributor/add-event' });
       }

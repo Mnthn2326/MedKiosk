@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --experimental-strip-types --test __tests__/payload.test.ts __tests__/useDraft.test.ts __tests__/eventCard.test.ts __tests__/prescription.test.ts __tests__/validations.test.ts __tests__/timeline.test.ts __tests__/aiScribe.test.ts __tests__/summaryToast.test.ts __tests__/summaryReview.test.ts __tests__/reviewAttributionAndEmbedding.test.ts __tests__/chatPersistence.test.ts __tests__/authMiddleware.test.ts __tests__/signup.test.ts __tests__/canvasAccess.test.ts __tests__/roleGuard.test.ts __tests__/safeRedirect.test.ts __tests__/passwordReset.test.ts"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",

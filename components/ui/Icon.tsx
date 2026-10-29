@@ -9,7 +9,13 @@ import {
   AlertTriangle,
   MessageSquare,
   FileText,
-  Copy
+  Copy,
+  CreditCard,
+  Siren,
+  Receipt,
+  PhoneCall,
+  ShieldCheck,
+  MapPin,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -25,7 +31,15 @@ export type IconName =
   | 'alert' 
   | 'chat' 
   | 'notes'
-  | 'copy';
+  | 'copy'
+  | 'finhealth'
+  | 'emergency'
+  | 'creditCard'
+  | 'siren'
+  | 'receipt'
+  | 'phone'
+  | 'shield'
+  | 'mapPin';
 
 const iconMap: Record<IconName, LucideIcon> = {
   diagnosis: Stethoscope,
@@ -40,6 +54,14 @@ const iconMap: Record<IconName, LucideIcon> = {
   chat: MessageSquare,
   notes: FileText,
   copy: Copy,
+  finhealth: CreditCard,
+  emergency: Siren,
+  creditCard: CreditCard,
+  siren: Siren,
+  receipt: Receipt,
+  phone: PhoneCall,
+  shield: ShieldCheck,
+  mapPin: MapPin,
 };
 
 interface IconProps {

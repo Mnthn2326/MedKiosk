@@ -58,6 +58,23 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
     }
     
     setIsSubmitting(true);
+
+    const payloadContent: Record<string, unknown> =
+      eventType === 'prescription'
+        ? {
+            medications: [
+              {
+                medication: content.medication?.trim() || '',
+                name: content.medication?.trim() || '',
+                dosage: content.dosage?.trim() || '',
+                frequency: content.frequency?.trim() || '',
+                duration: content.duration?.trim() || '',
+                notes: content.notes?.trim() || '',
+                instructions: content.notes?.trim() || '',
+              },
+            ],
+          }
+        : content;
     
     try {
       const response = await fetch('/api/clinical-events', {
@@ -67,7 +84,7 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
           deidentified_code: deidentifiedCode,
           event_type: eventType,
           trust_tier: trustTier,
-          content,
+          content: payloadContent,
           contributor_id: contributorId
         })
       });

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -13,63 +12,52 @@ export default function SignupPage() {
   const [role, setRole] = useState('patient');
   const [domain, setDomain] = useState('');
   const [verifiedId, setVerifiedId] = useState('');
+  const [invitationCode, setInvitationCode] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // 1. Sign up with auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role,
+          domain: role !== 'patient' ? domain : undefined,
+          verified_id: role !== 'patient' ? verifiedId : undefined,
+          invitation_code: role === 'doctor' ? invitationCode : undefined,
+        }),
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Failed to create user');
+      const data = await response.json();
 
-      const userId = authData.user.id;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create account');
+      }
 
-      // 2. Insert into users table and get the row id
-      const { data: userRow, error: userError } = await supabase
-        .from('users')
-        .insert([
-          { auth_id: userId, role, name, email }
-        ])
-        .select('id')
-        .single();
-
-      if (userError) throw userError;
-      if (!userRow) throw new Error('Failed to create user profile');
-
-      const profileId = userRow.id;
-
-      // 3. Handle role-specific inserts
-      if (role === 'patient') {
-        const deidentifiedCode = 'MK-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-        const { error: patientError } = await supabase
-          .from('patients')
-          .insert([
-            { user_id: profileId, deidentified_code: deidentifiedCode }
-          ]);
-        if (patientError) throw patientError;
+      if (data.email_confirmation_required) {
+        toast.success(
+          'Account registered! Please check your email inbox to confirm your account before signing in.'
+        );
       } else {
-        const { error: contributorError } = await supabase
-          .from('contributors')
-          .insert([
-            { user_id: profileId, type: role, domain, verified_id: verifiedId }
-          ]);
-        if (contributorError) throw contributorError;
+        toast.success('Account created successfully! Redirecting to sign in...');
       }
 
       router.push('/login');
     } catch (err: unknown) {
-      console.error('Signup error:', err);
+      console.error('Signup error occurred');
       const errorObj = err as { message?: string };
-      toast.error(errorObj?.message || (typeof err === 'string' ? err : 'An error occurred during signup'));
+      toast.error(
+        errorObj?.message || (typeof err === 'string' ? err : 'An error occurred during signup')
+      );
       setLoading(false);
     }
   };
@@ -111,10 +99,10 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
               required
-              minLength={6}
+              minLength={8}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1">Role</label>
             <select
@@ -122,12 +110,33 @@ export default function SignupPage() {
               onChange={(e) => setRole(e.target.value)}
               className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
             >
-              <option value="patient">Patient</option>
-              <option value="doctor">Doctor</option>
-              <option value="lab">Laboratory</option>
-              <option value="diagnostic_center">Diagnostic Center</option>
+              <option value="patient">Patient (Public)</option>
+              <option value="doctor">Doctor (Invitation Required)</option>
+              <option value="lab">Laboratory (Partner)</option>
+              <option value="diagnostic_center">Diagnostic Center (Partner)</option>
             </select>
           </div>
+
+          {role === 'doctor' && (
+            <div className="bg-blue-50/60 border border-blue-200/80 rounded-lg p-3 space-y-2">
+              <div className="text-xs text-blue-900 font-medium">
+                Clinical accounts require an authorized invitation code issued by administrative governance.
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text-primary mb-1">
+                  Doctor Invitation / Verification Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={invitationCode}
+                  onChange={(e) => setInvitationCode(e.target.value)}
+                  placeholder="e.g. MEDNOTES-DOC-VERIFIED"
+                  className="w-full px-3 py-1.5 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white text-sm"
+                  required
+                />
+              </div>
+            </div>
+          )}
 
           {isContributor && (
             <>
@@ -152,7 +161,9 @@ export default function SignupPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-1">Verification ID / License No.</label>
+                <label className="block text-sm font-medium text-text-primary mb-1">
+                  {role === 'doctor' ? 'Medical License / Registration No.' : 'Verification ID / Facility License No.'}
+                </label>
                 <input
                   type="text"
                   value={verifiedId}

@@ -1,17 +1,20 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { sanitizeRedirectPath } from '@/lib/authRoutes';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  // if "next" is in param, use it as the redirect URL
-  const next = searchParams.get('next') ?? '/';
+
+  // Validate and sanitize the redirect destination to prevent open redirects (AUTH-05)
+  const nextParam = searchParams.get('next');
+  const safeNext = sanitizeRedirectPath(nextParam, '/');
 
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(new URL(safeNext, origin).toString());
     }
   }
 

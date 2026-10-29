@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-
 import { toast } from 'sonner';
+import { validatePasswordReset, MIN_PASSWORD_LENGTH } from '@/lib/passwordReset';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -17,34 +17,34 @@ export default function ResetPasswordPage() {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const validation = validatePasswordReset(password, confirmPassword);
+    if (!validation.valid) {
+      toast.error(validation.error || 'Invalid password');
+      return;
+    }
+
     setLoading(true);
 
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
-      setLoading(false);
-      return;
-    }
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: password,
+      });
 
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      if (error) {
+        toast.error(error.message || 'Failed to update password');
+      } else {
+        toast.success('Password updated successfully! Redirecting...');
+        // After updating password, they are securely logged in.
+        // Redirect to homepage after a short delay
+        setTimeout(() => {
+          router.push('/');
+        }, 2000);
+      }
+    } catch {
+      toast.error('An unexpected error occurred while updating your password');
+    } finally {
       setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.updateUser({
-      password: password,
-    });
-
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-    } else {
-      toast.success('Password updated successfully! Redirecting...');
-      // After updating password, they are securely logged in.
-      // Redirect to homepage after a short delay
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
     }
   };
 
@@ -64,6 +64,8 @@ export default function ResetPasswordPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 pr-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
                 required
+                minLength={MIN_PASSWORD_LENGTH}
+                placeholder="At least 8 characters"
               />
               <button
                 type="button"
@@ -78,6 +80,7 @@ export default function ResetPasswordPage() {
                 )}
               </button>
             </div>
+            <p className="text-xs text-text-muted mt-1">Must be at least 8 characters</p>
           </div>
           
           <div>
@@ -89,6 +92,8 @@ export default function ResetPasswordPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-2 pr-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
                 required
+                minLength={MIN_PASSWORD_LENGTH}
+                placeholder="Re-enter your password"
               />
               <button
                 type="button"

@@ -84,6 +84,38 @@ export interface AmbulanceDriver {
   status: DriverStatus;
 }
 
+export interface Conversation {
+  id: string;
+  patient_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type MessageRole = 'user' | 'model' | 'assistant';
+
+export interface ChatMessageRecord {
+  id: string;
+  conversation_id: string;
+  patient_id: string;
+  role: MessageRole;
+  content: string;
+  created_at: string;
+}
+
+export type CanvasAccessLevel = 'read' | 'read_write' | 'emergency';
+
+export interface CanvasAccess {
+  id: string;
+  patient_id: string;
+  doctor_id: string;
+  access_level: CanvasAccessLevel;
+  revoked: boolean;
+  revoked_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DispatchRequest {
   id: string;
   patient_id: string;

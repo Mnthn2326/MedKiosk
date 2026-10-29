@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { UserRole } from '@/types/database';
@@ -96,6 +95,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
   if (role === 'patient') {
     links.push({ href: '/patient/timeline', label: 'My Timeline', icon: 'notes' });
     links.push({ href: '/patient/chat', label: 'AI Chat', icon: 'chat' });
+    links.push({ href: '/patient/finhealth', label: 'FinHealth & Claims', icon: 'finhealth' });
+    links.push({ href: '/patient/emergency', label: 'Emergency SOS', icon: 'emergency' });
   } else if (role === 'doctor') {
     links.push({ href: '/doctor/patients', label: 'Patients', icon: 'diagnosis' });
   } else if (role === 'lab' || role === 'diagnostic_center') {

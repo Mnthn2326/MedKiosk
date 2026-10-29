@@ -51,8 +51,12 @@ export async function retrieveRelevantEvents(
       return fallbackQuery(supabase, patientId);
     }
 
-    // Re-rank by similarity × trust weight
+    // Re-rank by similarity × trust weight, excluding rejected or known-stale events
     return (data || [])
+      .filter((event: Record<string, unknown>) => {
+        const content = (event.content || {}) as Record<string, unknown>;
+        return content.rejected !== true && content.embedding_stale !== true;
+      })
       .map((event: Record<string, unknown>) => ({
         ...event,
         id: event.id as string,
@@ -92,7 +96,10 @@ async function fallbackQuery(
     return [];
   }
 
-  return data || [];
+  return (data || []).filter((event: Record<string, unknown>) => {
+    const content = (event.content || {}) as Record<string, unknown>;
+    return content.rejected !== true;
+  });
 }
 
 /**

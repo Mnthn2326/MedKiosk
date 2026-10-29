@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import DoctorTimelineClient from './DoctorTimelineClient';
 import type { ClinicalEvent } from '@/types/database';
 import { CopyableCode } from '@/components/ui/CopyableCode';
+import { verifyDoctorPatientAccess } from '@/lib/canvasAccess';
 
 interface PageProps {
   params: Promise<{ patientId: string }>;
@@ -13,6 +14,7 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
   const { patientId } = await params;
   const supabase = await createClient();
 
+  // 1. Verify authentication
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -21,7 +23,24 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
     redirect('/login');
   }
 
-  // Get patient info (deidentified only)
+  // 2. Verify doctor role and resolve doctor profile
+  const { data: profile } = await supabase
+    .from('users')
+    .select('id, name, role')
+    .eq('auth_id', user.id)
+    .single();
+
+  if (!profile || profile.role !== 'doctor') {
+    redirect('/login');
+  }
+
+  // 3. Verify active canvas access grant for this patient
+  const hasAccess = await verifyDoctorPatientAccess(supabase, profile.id, patientId);
+  if (!hasAccess) {
+    redirect('/doctor/patients?error=unauthorized');
+  }
+
+  // 4. Get patient info (deidentified only)
   const { data: patient } = await supabase
     .from('patients')
     .select('id, deidentified_code, gender, dob')
@@ -32,27 +51,19 @@ export default async function DoctorTimelinePage({ params }: PageProps) {
     redirect('/doctor/patients');
   }
 
-  // Get the logged-in doctor's contributor record
-  const { data: profile } = await supabase
-    .from('users')
-    .select('id, name')
-    .eq('auth_id', user.id)
-    .single();
-
+  // 5. Get the logged-in doctor's contributor record
   let contributorId = '';
   let contributorDomain = '';
 
-  if (profile) {
-    const { data: contributor } = await supabase
-      .from('contributors')
-      .select('id, domain')
-      .eq('user_id', profile.id)
-      .single();
+  const { data: contributor } = await supabase
+    .from('contributors')
+    .select('id, domain')
+    .eq('user_id', profile.id)
+    .single();
 
-    if (contributor) {
-      contributorId = contributor.id;
-      contributorDomain = contributor.domain || '';
-    }
+  if (contributor) {
+    contributorId = contributor.id;
+    contributorDomain = contributor.domain || '';
   }
 
   // Fetch clinical events for this patient with contributor info

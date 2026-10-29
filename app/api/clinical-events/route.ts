@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateEmbedding } from '@/lib/gemini';
 import { clinicalEventSchema, createValidationError } from '@/lib/validations';
+import { verifyDoctorPatientAccess } from '@/lib/canvasAccess';
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,6 +67,16 @@ export async function POST(request: NextRequest) {
     }
     
     final_patient_id = patient.id;
+
+    if (profile.role === 'doctor') {
+      const hasAccess = await verifyDoctorPatientAccess(supabase, profile.id, patient.id);
+      if (!hasAccess) {
+        return NextResponse.json(
+          { error: 'Forbidden: You do not have active access to this patient canvas' },
+          { status: 403 }
+        );
+      }
+    }
 
     // Securely derive contributor_id from session
     let final_contributor_id: string | null = null;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateEmbedding, generateSummary } from '@/lib/gemini';
 import { retrieveRelevantEvents, formatEventsAsContext } from '@/lib/rag';
+import { verifyDoctorPatientAccess } from '@/lib/canvasAccess';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     const { data: profile } = await supabase
       .from('users')
-      .select('role')
+      .select('id, role')
       .eq('auth_id', user.id)
       .single();
 
@@ -30,6 +31,15 @@ export async function POST(request: NextRequest) {
 
     if (!patient_id) {
       return NextResponse.json({ error: 'patient_id is required' }, { status: 400 });
+    }
+
+    // Verify active doctor-patient access grant
+    const hasAccess = await verifyDoctorPatientAccess(supabase, profile.id, patient_id);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { error: 'Forbidden: You do not have active access to this patient record' },
+        { status: 403 }
+      );
     }
 
     // Retrieve relevant clinical events using RAG

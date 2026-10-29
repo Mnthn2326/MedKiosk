@@ -116,7 +116,7 @@ export default function DoctorTimelineClient({
         if (prev.find((e) => e.id === event.id)) return prev;
         return [event, ...prev];
       });
-      toast.success('AI Scribe successfully parsed unstructured notes');
+      toast.success('AI summary generated successfully.');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to generate summary');
     } finally {
@@ -150,6 +150,7 @@ export default function DoctorTimelineClient({
         toast.success(`Review ${action} applied`);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Review action failed');
+        throw err;
       }
     },
     [],
