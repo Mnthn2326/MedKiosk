@@ -39,7 +39,12 @@ export default function PatientChat() {
       const res = await fetch('/api/rag/chat', { method: 'GET' });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.error || 'Failed to load conversation history');
+        if (res.status === 401 || res.status === 403) {
+          throw new Error(data?.error || 'Authentication required to access chat');
+        }
+        console.warn('Could not load chat history:', data?.error);
+        setConversationId((prev) => prev || crypto.randomUUID());
+        return;
       }
       const data = await res.json();
       if (data.conversation_id) {
@@ -59,7 +64,12 @@ export default function PatientChat() {
         );
       }
     } catch (err: unknown) {
-      setLoadError(err instanceof Error ? err.message : 'Unable to load conversation history');
+      if (err instanceof Error && (err.message.includes('Authentication') || err.message.includes('unauthorized'))) {
+        setLoadError(err.message);
+      } else {
+        console.warn('Chat history load notice:', err);
+      }
+      setConversationId((prev) => prev || crypto.randomUUID());
     } finally {
       setInitialLoading(false);
     }
@@ -85,13 +95,19 @@ export default function PatientChat() {
     setMessages((prev) => [...prev, optimisticMessage]);
     setLoading(true);
 
+    let activeId = conversationId;
+    if (!activeId) {
+      activeId = crypto.randomUUID();
+      setConversationId(activeId);
+    }
+
     try {
       const res = await fetch('/api/rag/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
-          conversation_id: conversationId || undefined,
+          conversation_id: activeId,
           history: messages.slice(-10),
         }),
       });

@@ -122,3 +122,6 @@ alter table claims disable row level security;
 alter table patient_credit disable row level security;
 alter table ambulance_drivers disable row level security;
 alter table dispatch_requests disable row level security;
+alter table conversations disable row level security;
+alter table chat_messages disable row level security;
+alter table canvas_access disable row level security;

@@ -100,3 +100,8 @@ create policy "Patients can insert own chat messages"
       and u.auth_id = auth.uid()
     )
   );
+
+-- 7. Grant schema and table permissions
+grant usage on schema public to anon, authenticated, service_role;
+grant all on table conversations to anon, authenticated, service_role;
+grant all on table chat_messages to anon, authenticated, service_role;
