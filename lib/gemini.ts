@@ -13,10 +13,8 @@ const TEXT_MODELS = [
   'gemini-3.6-flash',
 ];
 
-interface GenerateOptions {
-  contents: unknown;
-  config?: Record<string, unknown>;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type GenerateOptions = Record<string, any>;
 
 async function generateContentWithFallback(options: GenerateOptions) {
   let lastError: unknown;
@@ -25,7 +23,8 @@ async function generateContentWithFallback(options: GenerateOptions) {
       const response = await ai.models.generateContent({
         ...options,
         model,
-      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
       return response;
     } catch (err: unknown) {
       console.warn(`[Gemini API] Model ${model} unavailable, attempting next fallback:`, err instanceof Error ? err.message : err);
