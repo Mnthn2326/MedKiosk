@@ -271,7 +271,7 @@ export function EventCard({ event, readOnly: _readOnly = false }: EventCardProps
               : undefined;
 
   return (
-    <div className={`bg-white border shadow-sm rounded-xl overflow-hidden ${borderClass}`}>
+    <div className={`bg-surface-card border shadow-sm rounded-xl overflow-hidden ${borderClass}`}>
       {/* Header */}
       <div className="px-6 py-4 flex flex-row items-center justify-between border-b border-border/50 pb-2">
         <h3 className="text-sm font-semibold capitalize text-text-primary flex items-center gap-1.5">
@@ -320,7 +320,7 @@ export function EventCard({ event, readOnly: _readOnly = false }: EventCardProps
       </div>
 
       {/* Footer timestamp */}
-      <div className="px-6 py-3 bg-gray-50 text-xs text-text-muted border-t border-border/50 tabular-nums">
+      <div className="px-6 py-3 bg-gray-50 dark:bg-slate-900/50 text-xs text-text-muted border-t border-border/50 tabular-nums">
         {new Date(event.created_at).toLocaleString()}
       </div>
     </div>

@@ -84,9 +84,9 @@ export default function DoctorPatientsClient({
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/doctor/timeline/${patient.id}?consult=true`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white dark:text-[#041A1E] text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors shadow-xs"
                   >
-                    <Icon name="diagnosis" size={14} className="text-white" /> Start Consultation
+                    <Icon name="diagnosis" size={14} className="text-white dark:text-[#041A1E]" /> Start Consultation
                   </Link>
                   <Link
                     href={`/doctor/timeline/${patient.id}`}

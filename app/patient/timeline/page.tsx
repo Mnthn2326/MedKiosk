@@ -99,17 +99,17 @@ export default async function PatientTimelinePage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6 sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-border/50 pb-4 pt-2 -mx-2 px-2">
+      <div className="mb-6 sticky top-0 z-10 bg-background/85 backdrop-blur-md border-b border-border/50 pb-4 pt-2 -mx-2 px-2">
         <h1 className="text-2xl font-bold text-primary">{profile.name}</h1>
         <div className="flex flex-wrap items-center gap-3 mt-2">
           <CopyableCode code={patient.deidentified_code} label="Share Code" />
           {patient.gender && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-text-muted text-xs font-medium">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-text-muted text-xs font-medium">
               {patient.gender}
             </span>
           )}
           {patientAge && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-text-muted text-xs font-medium">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-text-muted text-xs font-medium">
               Age: {patientAge}
             </span>
           )}

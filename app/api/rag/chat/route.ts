@@ -317,8 +317,8 @@ export async function POST(request: NextRequest) {
     let responseText: string;
     try {
       responseText = await chatWithContext(context, message, historyForAi);
-    } catch {
-      console.error('RAG chat generation error');
+    } catch (err: unknown) {
+      console.error('RAG chat generation error:', err instanceof Error ? err.message : err);
       return NextResponse.json(
         {
           error: 'Failed to generate response. Please try again.',

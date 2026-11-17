@@ -3,6 +3,39 @@ import { GoogleGenAI } from '@google/genai';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 /**
+ * Resilient model priority queue.
+ * Automatically cascades to fast fallback models if upstream models experience 503/429 spikes.
+ */
+const TEXT_MODELS = [
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
+  'gemini-3.6-flash',
+];
+
+interface GenerateOptions {
+  contents: unknown;
+  config?: Record<string, unknown>;
+}
+
+async function generateContentWithFallback(options: GenerateOptions) {
+  let lastError: unknown;
+  for (const model of TEXT_MODELS) {
+    try {
+      const response = await ai.models.generateContent({
+        ...options,
+        model,
+      });
+      return response;
+    } catch (err: unknown) {
+      console.warn(`[Gemini API] Model ${model} unavailable, attempting next fallback:`, err instanceof Error ? err.message : err);
+      lastError = err;
+    }
+  }
+  throw lastError;
+}
+
+/**
  * Generate a 768-dimensional embedding for text content.
  * Uses Gemini gemini-embedding-001 model configured to 768 dimensions.
  */
@@ -43,8 +76,7 @@ Be concise, factual, and only reference information present in the provided clin
 
 Respond ONLY with valid JSON, no markdown formatting.`;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3.6-flash',
+  const response = await generateContentWithFallback({
     contents: prompt,
     config: {
       responseMimeType: 'application/json',
@@ -87,8 +119,7 @@ ${context}`;
     },
   ];
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3.6-flash',
+  const response = await generateContentWithFallback({
     contents,
     config: {
       systemInstruction,
@@ -145,8 +176,7 @@ Return ONLY valid JSON matching this exact structure:
   ]
 }`;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3.6-flash',
+  const response = await generateContentWithFallback({
     contents: prompt,
     config: {
       responseMimeType: 'application/json',

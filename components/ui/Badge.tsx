@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type BadgeStatus = 'confirmed' | 'pending' | 'abnormal' | 'critical';
+export type BadgeStatus = 'confirmed' | 'pending' | 'abnormal' | 'critical' | 'verified';
 
 // Forcing a union of allowed labels ensures strict clinical terminology across the app
 export type BadgeLabel = 
@@ -36,6 +36,10 @@ const STYLES: Record<BadgeStatus, { container: string; dot: string }> = {
   critical: {
     container: 'bg-status-critical-bg text-status-critical-text',
     dot: 'bg-status-critical-dot',
+  },
+  verified: {
+    container: 'bg-primary/10 text-primary',
+    dot: 'bg-primary',
   },
 };
 

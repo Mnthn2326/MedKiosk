@@ -91,14 +91,14 @@ export function Timeline({
               onClick={() => setSelectedTier(tier)}
               className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
                 isActive
-                  ? 'bg-primary text-white shadow-xs'
-                  : 'bg-gray-100 text-text-muted hover:bg-gray-200 hover:text-text-primary'
+                  ? 'bg-primary text-white dark:text-[#041A1E] font-semibold shadow-xs dark:shadow-[0_0_10px_rgba(45,212,191,0.3)]'
+                  : 'bg-gray-100 dark:bg-slate-800 text-text-muted hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-text-primary'
               }`}
             >
               <span>{label}</span>
               <span
                 className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-gray-200 text-text-muted'
+                  isActive ? 'bg-white/20 dark:bg-[#041A1E]/20 text-white dark:text-[#041A1E] font-bold' : 'bg-gray-200 dark:bg-slate-700 text-text-muted'
                 }`}
               >
                 {count}

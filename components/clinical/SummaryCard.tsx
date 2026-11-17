@@ -111,11 +111,11 @@ export function SummaryCard({ event, onReview, readOnly = false }: SummaryCardPr
 
   return (
     <div
-      className={`bg-white shadow-sm rounded-xl border border-border border-l-4 ${borderLeftColor} overflow-hidden ${
+      className={`bg-surface-card shadow-sm rounded-xl border border-border border-l-4 ${borderLeftColor} overflow-hidden ${
         isRejected ? 'opacity-70' : ''
       }`}
     >
-      <div className="px-6 py-4 border-b border-border/50 flex justify-between items-center bg-gray-50">
+      <div className="px-6 py-4 border-b border-border/50 flex justify-between items-center bg-gray-50 dark:bg-slate-900/50">
         <h3 className="text-lg font-semibold text-text-primary flex items-center gap-2">
           AI-Generated Summary
           <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-white font-medium">AI</span>

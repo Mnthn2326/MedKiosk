@@ -18,7 +18,7 @@ const TIER_MAP: Record<TrustTier, { status: BadgeStatus; label: BadgeLabel }> = 
     label: 'Patient Uploaded',
   },
   institution_verified: {
-    status: 'pending', // Teal / Primary
+    status: 'verified', // Cyan / Teal / Primary
     label: 'Institution Verified',
   },
   doctor_confirmed: {

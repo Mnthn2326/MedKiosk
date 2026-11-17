@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { validatePasswordReset, MIN_PASSWORD_LENGTH } from '@/lib/passwordReset';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -49,8 +50,11 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md bg-white border border-border rounded-xl p-8 shadow-sm">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle collapsed={true} className="!w-auto bg-surface-card border border-border !p-2 shadow-xs" />
+      </div>
+      <div className="w-full max-w-md bg-surface-card border border-border rounded-xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-primary text-center mb-6">MediKiosk+</h1>
         <h2 className="text-xl text-text-primary text-center mb-8">Set New Password</h2>
 
@@ -62,7 +66,7 @@ export default function ResetPasswordPage() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 pr-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
+                className="w-full px-4 py-2 pr-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-surface-card"
                 required
                 minLength={MIN_PASSWORD_LENGTH}
                 placeholder="At least 8 characters"
@@ -90,7 +94,7 @@ export default function ResetPasswordPage() {
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2 pr-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
+                className="w-full px-4 py-2 pr-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-surface-card"
                 required
                 minLength={MIN_PASSWORD_LENGTH}
                 placeholder="Re-enter your password"

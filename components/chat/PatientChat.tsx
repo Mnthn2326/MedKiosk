@@ -216,34 +216,34 @@ export default function PatientChat() {
               key={msg.id || i}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <Card
-                className={`max-w-[80%] ${
-                  msg.role === 'user' ? 'bg-primary text-white' : 'bg-primary-light'
+              <div
+                className={`max-w-[80%] rounded-2xl p-4 shadow-xs text-sm whitespace-pre-wrap leading-relaxed ${
+                  msg.role === 'user'
+                    ? 'bg-primary text-white dark:text-[#041A1E] font-semibold rounded-tr-xs dark:shadow-[0_0_12px_rgba(45,212,191,0.25)]'
+                    : 'bg-surface-card border border-border text-text-primary rounded-tl-xs'
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-              </Card>
+                {msg.content}
+              </div>
             </div>
           ))}
 
         {loading && (
           <div className="flex justify-start">
-            <Card className="bg-primary-light">
-              <div className="flex items-center gap-2 text-text-muted text-sm">
-                <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                  <span
-                    className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                    style={{ animationDelay: '0.1s' }}
-                  />
-                  <span
-                    className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                    style={{ animationDelay: '0.2s' }}
-                  />
-                </div>
-                Searching your records...
+            <div className="bg-surface-card border border-border rounded-2xl rounded-tl-xs p-4 text-text-muted text-sm shadow-xs flex items-center gap-2">
+              <div className="flex gap-1">
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                <span
+                  className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                  style={{ animationDelay: '0.1s' }}
+                />
+                <span
+                  className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                  style={{ animationDelay: '0.2s' }}
+                />
               </div>
-            </Card>
+              Searching your records...
+            </div>
           </div>
         )}
 

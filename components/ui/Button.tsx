@@ -20,9 +20,9 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
   
   const variants = {
-    primary: 'bg-primary text-white hover:opacity-90 focus:ring-primary',
+    primary: 'bg-primary text-white dark:text-[#041A1E] font-semibold hover:opacity-90 dark:hover:brightness-110 focus:ring-primary shadow-xs dark:shadow-[0_0_12px_rgba(45,212,191,0.25)]',
     accent: 'bg-accent text-white hover:opacity-90 focus:ring-accent',
-    success: 'bg-success text-white hover:opacity-90 focus:ring-success',
+    success: 'bg-success text-white dark:text-[#052E16] font-semibold hover:opacity-90 focus:ring-success',
     danger: 'bg-danger text-white hover:opacity-90 focus:ring-danger',
     outline: 'border-2 border-border text-text-primary hover:bg-primary-light hover:border-primary hover:text-primary focus:ring-primary',
   };

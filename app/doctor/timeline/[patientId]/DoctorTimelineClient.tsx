@@ -202,7 +202,7 @@ export default function DoctorTimelineClient({
             {/* Show "Record Consultation" button on mobile timeline view only to quickly switch to consultation */}
             <button
               onClick={() => setActiveTab('consultation')}
-              className="md:hidden inline-flex items-center gap-2 px-5 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors shadow-sm text-sm ml-auto"
+              className="md:hidden inline-flex items-center gap-2 px-5 py-2 bg-primary text-white dark:text-[#041A1E] font-semibold rounded-lg hover:bg-primary/90 transition-colors shadow-sm text-sm ml-auto cursor-pointer"
             >
               <Icon name="diagnosis" size={14} /> New Note
             </button>

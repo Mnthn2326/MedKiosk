@@ -7,6 +7,7 @@ import { UserRole } from '@/types/database';
 import { Icon } from '@/components/ui/Icon';
 import type { IconName } from '@/components/ui/Icon';
 import { GuardedLink } from '@/components/ui/GuardedLink';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 interface SidebarProps {
   role?: UserRole;
@@ -109,20 +110,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
   return (
     <>
       {/* Mobile Topbar */}
-      <div className="md:hidden flex items-center justify-between bg-primary text-white p-4 sticky top-0 z-40">
+      <div className="md:hidden flex items-center justify-between bg-[#0F4C5C] dark:bg-[#0A121E] border-b border-white/10 dark:border-slate-800 text-white p-4 sticky top-0 z-40">
         <div className="flex items-center gap-2 font-bold text-xl">
-          <Icon name="diagnosis" size={24} />
+          <Icon name="diagnosis" size={24} className="text-white dark:text-primary" />
           MediKiosk+
         </div>
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 -mr-2 text-white">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {mobileOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+        <div className="flex items-center gap-1">
+          <ThemeToggle collapsed={true} className="!p-1.5 !w-auto" />
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 -mr-2 text-white" aria-label="Toggle navigation menu">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Sidebar Overlay (Mobile) */}
@@ -135,13 +139,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
 
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed md:sticky top-0 left-0 h-screen bg-primary text-white transition-all duration-300 z-50 flex flex-col ${
+        className={`fixed md:sticky top-0 left-0 h-screen bg-[#0F4C5C] dark:bg-[#0A121E] border-r border-transparent dark:border-slate-800 text-white transition-all duration-300 z-50 flex flex-col ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         } ${isCollapsed ? 'md:w-16' : 'md:w-64 w-64'}`}
       >
-        <div className="p-4 flex items-center justify-between border-b border-white/10 shrink-0 h-16">
+        <div className="p-4 flex items-center justify-between border-b border-white/10 dark:border-slate-800/80 shrink-0 h-16">
           <GuardedLink href="/" className="flex items-center gap-2 overflow-hidden whitespace-nowrap">
-            <Icon name="diagnosis" size={24} className="shrink-0" />
+            <Icon name="diagnosis" size={24} className="shrink-0 text-white dark:text-primary" />
             <span className={`font-bold text-xl transition-opacity duration-300 ${isCollapsed ? 'md:opacity-0 md:w-0' : 'opacity-100'}`}>
               MediKiosk+
             </span>
@@ -149,7 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
           {/* Desktop collapse toggle */}
           <button 
             onClick={toggleCollapse} 
-            className="hidden md:flex p-1.5 hover:bg-white/10 rounded-lg shrink-0"
+            className="hidden md:flex p-1.5 hover:bg-white/10 dark:hover:bg-slate-800 rounded-lg shrink-0"
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <svg className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,7 +171,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors whitespace-nowrap overflow-hidden ${
-                  active ? 'bg-white/20 text-white font-medium' : 'text-white/80 hover:bg-white/10 hover:text-white'
+                  active
+                    ? 'bg-white/20 dark:bg-primary/15 text-white dark:text-primary font-semibold dark:border-l-2 dark:border-primary shadow-xs'
+                    : 'text-white/80 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-800/60 hover:text-white dark:hover:text-slate-100'
                 }`}
                 title={isCollapsed ? link.label : undefined}
               >
@@ -197,6 +203,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, userName }) => {
               </kbd>
             )}
           </button>
+          {/* Theme Switcher */}
+          <div className="mt-2 pt-2 border-t border-white/10">
+            <ThemeToggle collapsed={isCollapsed} />
+          </div>
         </div>
 
         <div className="p-4 border-t border-white/10 shrink-0">

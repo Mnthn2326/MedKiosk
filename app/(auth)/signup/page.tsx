@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -65,8 +66,11 @@ export default function SignupPage() {
   const isContributor = ['doctor', 'lab', 'diagnostic_center'].includes(role);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 py-12">
-      <div className="w-full max-w-md bg-white border border-border rounded-xl p-8 shadow-sm">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 py-12 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle collapsed={true} className="!w-auto bg-surface-card border border-border !p-2 shadow-xs" />
+      </div>
+      <div className="w-full max-w-md bg-surface-card border border-border rounded-xl p-8 shadow-sm">
         <h1 className="text-3xl font-bold text-primary text-center mb-6">MediKiosk+</h1>
         <h2 className="text-xl text-text-primary text-center mb-8">Create your account</h2>
 
@@ -77,7 +81,7 @@ export default function SignupPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-surface-card"
               required
             />
           </div>
@@ -87,7 +91,7 @@ export default function SignupPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-surface-card"
               required
             />
           </div>
@@ -97,7 +101,7 @@ export default function SignupPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-surface-card"
               required
               minLength={8}
             />
@@ -108,7 +112,7 @@ export default function SignupPage() {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-white"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary bg-surface-card"
             >
               <option value="patient">Patient (Public)</option>
               <option value="doctor">Doctor (Invitation Required)</option>

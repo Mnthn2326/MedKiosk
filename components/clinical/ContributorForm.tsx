@@ -224,7 +224,7 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50"
+              className="px-6 py-2 bg-primary text-white dark:text-[#041A1E] rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors shadow-xs"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Event'}
             </button>

@@ -1,13 +1,86 @@
 ﻿{
-  "colors": {
-    "primary": "#0F4C5C", "primaryLight": "#E7EEF0", "accent": "#D85A30",
-    "success": "#1B8A5A", "warning": "#E0A106", "danger": "#C1121F",
-    "textPrimary": "#1B2B2E", "textMuted": "#64748B",
-    "border": "#E2E8F0", "background": "#FFFFFF"
+  "name": "MediKiosk+ Design Tokens",
+  "themes": {
+    "light": {
+      "id": "clinical_calm",
+      "name": "Clinical Calm",
+      "colors": {
+        "primary": "#0F4C5C",
+        "primaryLight": "#E7EEF0",
+        "accent": "#D85A30",
+        "success": "#1B8A5A",
+        "warning": "#E0A106",
+        "danger": "#C1121F",
+        "textPrimary": "#1B2B2E",
+        "textMuted": "#64748B",
+        "border": "#E2E8F0",
+        "background": "#FFFFFF",
+        "surfaceCard": "#FFFFFF"
+      },
+      "trustTierColors": {
+        "self_reported": { "dot": "#64748B", "bg": "#E7EEF0" },
+        "patient_uploaded": { "dot": "#E0A106", "bg": "#FEF3C7" },
+        "institution_verified": { "dot": "#0F4C5C", "bg": "#E7EEF0" },
+        "doctor_confirmed": { "dot": "#1B8A5A", "bg": "#D1FAE5" }
+      },
+      "statusColors": {
+        "confirmed": { "bg": "#D1FAE5", "text": "#064E3B", "dot": "#1B8A5A" },
+        "pending": { "bg": "#E7EEF0", "text": "#0F4C5C", "dot": "#64748B" },
+        "abnormal": { "bg": "#FEF3C7", "text": "#78350F", "dot": "#E0A106" },
+        "critical": { "bg": "#FEE2E2", "text": "#7F1D1D", "dot": "#C1121F" }
+      },
+      "subsystems": {
+        "finhealthCanvas": "linear-gradient(135deg, #0F4C5C 0%, #145d70 50%, #0a3540 100%)",
+        "creditHealth": {
+          "safe": "#10B981",
+          "moderate": "#F59E0B",
+          "danger": "#F43F5E"
+        },
+        "emergencySos": "linear-gradient(135deg, #E11D48 0%, #B91C1C 100%)",
+        "radarCanvas": { "outer": "#0F172A", "base": "#0C1322" }
+      }
+    },
+    "dark": {
+      "id": "tactical_night",
+      "name": "Tactical Night",
+      "colors": {
+        "primary": "#2DD4BF",
+        "primaryLight": "#1E293B",
+        "accent": "#F43F5E",
+        "success": "#34D399",
+        "warning": "#FBBF24",
+        "danger": "#EF4444",
+        "textPrimary": "#F8FAFC",
+        "textMuted": "#94A3B8",
+        "border": "#334155",
+        "background": "#0F172A",
+        "surfaceCard": "#1E293B"
+      },
+      "trustTierColors": {
+        "self_reported": { "dot": "#94A3B8", "bg": "rgba(148, 163, 184, 0.15)" },
+        "patient_uploaded": { "dot": "#FBBF24", "bg": "rgba(251, 191, 36, 0.15)" },
+        "institution_verified": { "dot": "#2DD4BF", "bg": "rgba(45, 212, 191, 0.15)" },
+        "doctor_confirmed": { "dot": "#34D399", "bg": "rgba(52, 211, 153, 0.15)" }
+      },
+      "statusColors": {
+        "confirmed": { "bg": "rgba(52, 211, 153, 0.15)", "text": "#A7F3D0", "dot": "#34D399" },
+        "pending": { "bg": "rgba(148, 163, 184, 0.15)", "text": "#E2E8F0", "dot": "#94A3B8" },
+        "abnormal": { "bg": "rgba(251, 191, 36, 0.15)", "text": "#FDE68A", "dot": "#FBBF24" },
+        "critical": { "bg": "rgba(239, 68, 68, 0.15)", "text": "#FECACA", "dot": "#EF4444" }
+      },
+      "subsystems": {
+        "finhealthCanvas": "linear-gradient(135deg, #020617 0%, #0F172A 50%, #1E293B 100%)",
+        "creditHealth": {
+          "safe": "#34D399",
+          "moderate": "#FBBF24",
+          "danger": "#EF4444"
+        },
+        "emergencySos": "linear-gradient(135deg, #F43F5E 0%, #BE123C 100%)",
+        "radarCanvas": { "outer": "#0F172A", "base": "#0C1322" }
+      }
+    }
   },
-  "trustTierColors": {
-    "self_reported": "#94A3B8", "patient_uploaded": "#E0A106",
-    "institution_verified": "#0F4C5C", "doctor_confirmed": "#1B8A5A"
-  },
-  "font": "Inter", "radiusCard": "12px", "radiusButton": "8px"
+  "font": "Inter",
+  "radiusCard": "12px",
+  "radiusButton": "8px"
 }

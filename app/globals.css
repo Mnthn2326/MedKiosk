@@ -1,7 +1,10 @@
 @import "tailwindcss";
 
-/* ── Design Tokens from docs/design-tokens.json ── */
-@theme {
+@variant dark (&:where(.dark, .dark *));
+
+/* ── Theme Definitions ── */
+:root {
+  /* ── Light Theme: "Clinical Calm" ── */
   --color-primary: #0F4C5C;
   --color-primary-light: #E7EEF0;
   --color-accent: #D85A30;
@@ -14,7 +17,7 @@
   --color-background: #FFFFFF;
 
   /* Trust tier badge colors */
-  --color-tier-self-reported: #94A3B8;
+  --color-tier-self-reported: #64748B;
   --color-tier-patient-uploaded: #E0A106;
   --color-tier-institution-verified: #0F4C5C;
   --color-tier-doctor-confirmed: #1B8A5A;
@@ -45,11 +48,121 @@
   --color-surface-card: #FFFFFF;
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 
-  /* Radii */
+  /* Subsystems */
+  --finhealth-canvas: linear-gradient(135deg, #0F4C5C 0%, #145d70 50%, #0a3540 100%);
+  --credit-tier-low: #10B981;
+  --credit-tier-mid: #F59E0B;
+  --credit-tier-high: #F43F5E;
+  --emergency-sos: linear-gradient(135deg, #E11D48 0%, #B91C1C 100%);
+
+  /* Radii & Typography */
   --radius-card: 12px;
   --radius-button: 8px;
-
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+.dark {
+  /* ── Dark Theme: "Tactical Night" ── */
+  --color-primary: #2DD4BF;
+  --color-primary-light: #1E293B;
+  --color-accent: #F43F5E;
+  --color-success: #34D399;
+  --color-warning: #FBBF24;
+  --color-danger: #EF4444;
+  --color-text-primary: #F8FAFC;
+  --color-text-muted: #94A3B8;
+  --color-border: #334155;
+  --color-background: #0F172A;
+
+  /* Trust tier badge colors */
+  --color-tier-self-reported: #94A3B8;
+  --color-tier-patient-uploaded: #FBBF24;
+  --color-tier-institution-verified: #2DD4BF;
+  --color-tier-doctor-confirmed: #34D399;
+
+  /* Semantic Status Colors (15% Opacity Backgrounds) */
+  --color-status-confirmed-bg: rgba(52, 211, 153, 0.15);
+  --color-status-confirmed-text: #A7F3D0;
+  --color-status-confirmed-dot: #34D399;
+
+  --color-status-pending-bg: rgba(148, 163, 184, 0.15);
+  --color-status-pending-text: #E2E8F0;
+  --color-status-pending-dot: #94A3B8;
+
+  --color-status-abnormal-bg: rgba(251, 191, 36, 0.15);
+  --color-status-abnormal-text: #FDE68A;
+  --color-status-abnormal-dot: #FBBF24;
+
+  --color-status-critical-bg: rgba(239, 68, 68, 0.15);
+  --color-status-critical-text: #FECACA;
+  --color-status-critical-dot: #EF4444;
+  
+  /* Neutral scale */
+  --color-neutral-100: #1E293B;
+  --color-neutral-200: #334155;
+  --color-neutral-800: #F8FAFC;
+  
+  /* Surface & Depth */
+  --color-surface-card: #1E293B;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+
+  /* Subsystems */
+  --finhealth-canvas: linear-gradient(135deg, #020617 0%, #0F172A 50%, #1E293B 100%);
+  --credit-tier-low: #34D399;
+  --credit-tier-mid: #FBBF24;
+  --credit-tier-high: #EF4444;
+  --emergency-sos: linear-gradient(135deg, #F43F5E 0%, #BE123C 100%);
+}
+
+/* ── Dynamic Design Tokens registered with Tailwind CSS v4 ── */
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-accent: var(--color-accent);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  --color-background: var(--color-background);
+
+  /* Trust tier badge colors */
+  --color-tier-self-reported: var(--color-tier-self-reported);
+  --color-tier-patient-uploaded: var(--color-tier-patient-uploaded);
+  --color-tier-institution-verified: var(--color-tier-institution-verified);
+  --color-tier-doctor-confirmed: var(--color-tier-doctor-confirmed);
+
+  /* Semantic Status Colors */
+  --color-status-confirmed-bg: var(--color-status-confirmed-bg);
+  --color-status-confirmed-text: var(--color-status-confirmed-text);
+  --color-status-confirmed-dot: var(--color-status-confirmed-dot);
+
+  --color-status-pending-bg: var(--color-status-pending-bg);
+  --color-status-pending-text: var(--color-status-pending-text);
+  --color-status-pending-dot: var(--color-status-pending-dot);
+
+  --color-status-abnormal-bg: var(--color-status-abnormal-bg);
+  --color-status-abnormal-text: var(--color-status-abnormal-text);
+  --color-status-abnormal-dot: var(--color-status-abnormal-dot);
+
+  --color-status-critical-bg: var(--color-status-critical-bg);
+  --color-status-critical-text: var(--color-status-critical-text);
+  --color-status-critical-dot: var(--color-status-critical-dot);
+  
+  /* Neutral scale */
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-200: var(--color-neutral-200);
+  --color-neutral-800: var(--color-neutral-800);
+  
+  /* Surface & Depth */
+  --color-surface-card: var(--color-surface-card);
+
+  /* Radii */
+  --radius-card: var(--radius-card);
+  --radius-button: var(--radius-button);
+
+  --font-sans: var(--font-sans);
 }
 
 /* ── Base styles ── */
@@ -57,6 +170,7 @@ body {
   color: var(--color-text-primary);
   background: var(--color-background);
   font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Sonner Toast Customizations */
@@ -72,4 +186,10 @@ body {
   --warning-text: #FFFFFF;
   --info-bg: var(--color-primary);
   --info-text: #FFFFFF;
+}
+
+.dark :root {
+  --normal-bg: var(--color-surface-card);
+  --normal-border: var(--color-border);
+  --normal-text: var(--color-text-primary);
 }

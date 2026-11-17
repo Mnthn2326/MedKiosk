@@ -72,9 +72,9 @@ export function ClaimsTracker({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-border shadow-xs overflow-hidden">
+    <div className="bg-surface-card rounded-2xl border border-border shadow-xs overflow-hidden">
       {/* Header & Filter Tabs */}
-      <div className="p-5 border-b border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50/50">
+      <div className="p-5 border-b border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50/50 dark:bg-slate-900/40">
         <div>
           <h3 className="font-bold text-lg text-text-primary flex items-center gap-2">
             <Receipt size={20} className="text-primary" />
@@ -86,15 +86,15 @@ export function ClaimsTracker({
         </div>
 
         <div className="flex items-center gap-2 self-stretch sm:self-auto justify-between sm:justify-start">
-          <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200 text-xs">
+          <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-xl border border-gray-200 dark:border-slate-700 text-xs">
             {(['all', 'pending', 'approved', 'rejected'] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setFilter(tab)}
-                className={`px-3 py-1.5 rounded-lg capitalize font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg capitalize font-medium transition-all cursor-pointer ${
                   filter === tab
-                    ? 'bg-white text-text-primary shadow-xs font-semibold'
+                    ? 'bg-surface-card text-text-primary shadow-xs font-semibold'
                     : 'text-text-muted hover:text-text-primary'
                 }`}
               >
@@ -107,7 +107,7 @@ export function ClaimsTracker({
             <button
               type="button"
               onClick={onResetClaims}
-              className="p-1.5 rounded-lg border border-border hover:bg-gray-100 text-text-muted hover:text-text-primary text-xs"
+              className="p-1.5 rounded-lg border border-border hover:bg-gray-100 dark:hover:bg-slate-800 text-text-muted hover:text-text-primary text-xs cursor-pointer"
               title="Reset simulation to default seed data"
             >
               <RotateCcw size={14} />
@@ -132,7 +132,7 @@ export function ClaimsTracker({
           {filteredClaims.map((claim) => (
             <div
               key={claim.id}
-              className="p-5 hover:bg-gray-50/80 transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+              className="p-5 hover:bg-gray-50/80 dark:hover:bg-slate-900/40 transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
             >
               {/* Claim Meta */}
               <div className="flex items-start gap-3 min-w-[280px]">
@@ -164,7 +164,7 @@ export function ClaimsTracker({
               </div>
 
               {/* Status Simulation Controls (Demo Tooling) */}
-              <div className="flex items-center gap-2 self-end md:self-center bg-gray-50 px-3 py-2 rounded-xl border border-gray-200 text-xs">
+              <div className="flex items-center gap-2 self-end md:self-center bg-gray-50 dark:bg-slate-800/80 px-3 py-2 rounded-xl border border-gray-200 dark:border-slate-700 text-xs">
                 <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <Play size={10} className="fill-current text-primary" />
                   Simulate
