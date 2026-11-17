@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { TrustTierBadge } from './TrustTierBadge';
 import { toast } from 'sonner';
@@ -50,8 +50,8 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
     setContent(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!patientId) {
       toast.error('Please search and verify a patient first.');
       return;
@@ -101,21 +101,20 @@ export function ContributorForm({ contributorId, contributorType }: ContributorF
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [patientId, eventType, content, deidentifiedCode, trustTier, contributorId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         if (patientId && !isSubmitting) {
           e.preventDefault();
-          // We must trigger the form submission with a mock event
-          handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+          handleSubmit();
         }
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [patientId, isSubmitting, deidentifiedCode, eventType, trustTier, content, contributorId]); // all dependencies of handleSubmit
+  }, [patientId, isSubmitting, handleSubmit]);
 
   const renderContentFields = () => {
     switch (eventType) {

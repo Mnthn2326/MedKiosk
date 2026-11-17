@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { QrCode, Copy, Check, ExternalLink, Download } from 'lucide-react';
+import { Copy, Check, ExternalLink, Download } from 'lucide-react';
 
 interface DemoQRCodeCardProps {
   url?: string;
@@ -92,6 +92,7 @@ export function DemoQRCodeCard({
           <div className="absolute bottom-2 right-2 w-3.5 h-3.5 border-b-2 border-r-2 rounded-br-sm" style={{ borderColor: current.primaryHex }} />
 
           <div className="relative bg-white p-2 rounded-xl shadow-xs">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={qrImageUrl} 
               alt="MediKiosk Login QR Code"

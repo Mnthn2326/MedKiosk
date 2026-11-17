@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         }
       });
 
-    } catch (fetchError) {
+    } catch {
       clearTimeout(timeoutId);
       // Fallback
       return NextResponse.json({ results: [], degraded: true }, {
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

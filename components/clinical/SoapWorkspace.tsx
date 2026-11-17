@@ -250,6 +250,7 @@ export default function SoapWorkspace({ patientId, userId, onSuccess }: SoapWork
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftState, patientId]); // We need these dependencies because handleSubmit uses them
 
 
